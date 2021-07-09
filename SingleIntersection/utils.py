@@ -6,6 +6,20 @@ from sumolib import checkBinary
 import os
 import sys
 
+def import_generate_data_configuration(config_file):
+    """
+    Read the config file regarding the training and import its content
+    """
+    print(config_file)
+    content = configparser.ConfigParser()
+    content.read(config_file)
+    config = {}
+    config['gui'] = content['simulation'].getboolean('gui')
+    config['total_episodes'] = content['simulation'].getint('total_episodes')
+    config['max_steps'] = content['simulation'].getint('max_steps')
+    config['n_cars_generated'] = content['simulation'].getint('n_cars_generated')
+    config['sumocfg_file_name'] = content['dir']['sumocfg_file_name']
+    return config
 
 def import_train_configuration(config_file):
     """

@@ -4,18 +4,15 @@ import datetime
 
 import os
 import traci
-from generate_data_simulation import Simulation
+from generate_data_smulation import Simulation
 from generator import TrafficGenerator
-from utils import import_train_configuration, set_sumo
+from utils import import_generate_data_configuration, set_sumo
 
 
 if __name__ == "__main__":
 
-    config = import_train_configuration(config_file='training_settings.ini')
+    config = import_generate_data_configuration(config_file='generate_data_settings.ini')
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
-    
-    #traffic_data0.xml , traffic_data1
-
 
     TrafficGen = TrafficGenerator(
         config['max_steps'], 

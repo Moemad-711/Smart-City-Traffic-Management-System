@@ -16,6 +16,8 @@ class Simulation:
        
         start_time = timeit.default_timer()
         self._TrafficGen.generate_routefile(seed=episode)
+        self._step = 0
+
         traci.start(self._sumo_cmd)
         
         print("Simulating...")
