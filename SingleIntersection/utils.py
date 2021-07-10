@@ -192,7 +192,12 @@ def read_data_from_xml(file_neme,episode):
     data = data.astype(convert_dict)
 
     ### Creating an empty dataframe for proccessed data ###
-    
+    nodes_features_coloumns = [ 'east_speed','east_count',
+                                'west_speed','west_count',
+                                'north_speed','north_count',
+                                'south_speed','south_count']
+    nodes_features = None
+    traffic_features = pd.DataFrame(columns=['time_step','nodes_features'])
 
 
 
