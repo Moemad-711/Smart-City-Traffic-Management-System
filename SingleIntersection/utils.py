@@ -168,7 +168,7 @@ def data_split(dataset: pd.DataFrame, train_split, batch_size: int, prediction_s
 
 def read_data_from_xml(file_neme,episode):
     print(' reading file... ')
-    xml_data = open(file_neme,'r').read()
+    xml_data = open(os.path.join('TrafficData/'+file_neme),'r').read()
     root =  et.XML(xml_data)
 
     db_colomns = ['time_step','speed','edge']
@@ -196,8 +196,8 @@ def read_data_from_xml(file_neme,episode):
                                 'west_speed','west_count',
                                 'north_speed','north_count',
                                 'south_speed','south_count']
-    nodes_features = None
-    traffic_features = pd.DataFrame(columns=['time_step','nodes_features'])
+    nodes_features = pd.DataFrame(columns=nodes_features_coloumns)
+    #traffic_features = pd.DataFrame(columns=['time_step','nodes_features'])
 
     current_step = 0
     temp = []
@@ -218,17 +218,17 @@ def read_data_from_xml(file_neme,episode):
                 west_speed += data.iloc[i]['speed']
                 west_count += 1
 
-            if data.iloc[i]['edge'] =="3i_0":
+            if data.iloc[i]['edge'] =="N2TL":
                 north_speed += data.iloc[i]['speed']
                 north_count += 1
 
-            if data.iloc[i]['edge'] =="4i_0":
+            if data.iloc[i]['edge'] =="S2TL":
                 south_speed += data.iloc[i]['speed']
                 south_count += 1
         
         else:
             avg_east_speed = avg_west_speed = avg_north_speed = avg_south_speed = 0.0
-            
+                
             if east_count != 0:
                 avg_east_speed = east_speed/east_count
             
@@ -241,20 +241,34 @@ def read_data_from_xml(file_neme,episode):
             if south_count != 0:
                 avg_south_speed = south_speed/south_count
             
-            temp.append({'east_speed': avg_east_speed,'east_count': east_count,
-                         'west_speed': avg_west_speed,'west_count': west_count,
-                         'north_speed': avg_north_speed,'north_count': north_count,
-                         'south_speed': avg_south_speed,'south_count': south_count})
-            nodes_features = pd.DataFrame(temp, columns=nodes_features_coloumns, index=['TL'])
-            traffic_features.append({'time_step':current_step, 'nodes_features': [nodes_features]})
+            #temp.append({'east_speed': avg_east_speed,'east_count': east_count,
+            #            'west_speed': avg_west_speed,'west_count': west_count,
+            #            'north_speed': avg_north_speed,'north_count': north_count,
+            #            'south_speed': avg_south_speed,'south_count': south_count})
+            #print(' temp:')
+            #print('     ',temp)
 
-            temp = []
+            nodes_features.append({ 'east_speed': avg_east_speed,'east_count': east_count,
+                                    'west_speed': avg_west_speed,'west_count': west_count,
+                                    'north_speed': avg_north_speed,'north_count': north_count,
+                                    'south_speed': avg_south_speed,'south_count': south_count},
+                                    ignore_index = True)
+            #print(' nodes_features: ')
+            #print('     ', nodes_features)
+            #traffic_features.append({'time_step':current_step, 'nodes_features': nodes_features},ignore_index= True)
+            #print(' traffic_features: ')
+            #print('     ', traffic_features)
+
+            #temp = []
             east_speed = west_speed = north_speed = south_speed=0
             east_count = west_count = north_count = south_count=0
             current_step += 1
-    print(' processed data: ', traffic_features.head())
-    traffic_features.to_csv(os.path.join('TrafficFeatures/traffic_features'+str(episode)+'.xml'), index=False)
-    return traffic_features
+                
+
+
+    print(' processed data: ', nodes_features)
+    nodes_features.to_csv(os.path.join('TrafficFeatures/traffic_features'+str(episode)+'.xml'), index=False)
+    return nodes_features
 
 
 
