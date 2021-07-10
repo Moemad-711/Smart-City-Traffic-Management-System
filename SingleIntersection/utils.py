@@ -199,6 +199,16 @@ def read_data_from_xml(file_neme,episode):
     nodes_features = None
     traffic_features = pd.DataFrame(columns=['time_step','nodes_features'])
 
+    time_step = 0
+    east_speed = west_speed = north_speed = south_speed=0
+    east_count = west_count = north_count = south_count=0
+    avg_east_speed = avg_west_speed = avg_north_speed = avg_south_speed=0
+
+    raw_data_length = len(data)
+    for  in range(raw_data_length):
+        
+
+
 
 
 
