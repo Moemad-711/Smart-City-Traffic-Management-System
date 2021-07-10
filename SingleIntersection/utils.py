@@ -1,4 +1,6 @@
 import configparser
+import datetime
+import timeit
 import numpy as np
 
 import pandas as pd
@@ -187,7 +189,7 @@ def read_data_from_xml(file_neme,episode):
 
     ### Putting data in a dataframe ###                            
     data = pd.DataFrame(raws, columns=db_colomns)
-    print(' raw data: ', data)
+    print(' raw data: \n', data)
     convert_dict = {'time_step':float,'speed':float,'edge':str}
     data = data.astype(convert_dict)
 
@@ -195,9 +197,9 @@ def read_data_from_xml(file_neme,episode):
     nodes_features_coloumns = [ 'east_speed','east_count',
                                 'west_speed','west_count',
                                 'north_speed','north_count',
-                                'south_speed','south_count']
-    nodes_features = pd.DataFrame(columns=nodes_features_coloumns)
-    #traffic_features = pd.DataFrame(columns=['time_step','nodes_features'])
+                               'south_speed','south_count']
+    nodes_features = None
+    traffic_features = pd.DataFrame(columns=['time_step','nodes_features'])
 
     current_step = 0
     temp = []
@@ -206,6 +208,7 @@ def read_data_from_xml(file_neme,episode):
 
     ### Processing Data ###
     print(' processing data....')
+    start_time = timeit.default_timer()
     raw_data_length = len(data)
     for i in range(raw_data_length):
         if data.iloc[i]['time_step'] == current_step:
@@ -241,33 +244,29 @@ def read_data_from_xml(file_neme,episode):
             if south_count != 0:
                 avg_south_speed = south_speed/south_count
             
-            #temp.append({'east_speed': avg_east_speed,'east_count': east_count,
-            #            'west_speed': avg_west_speed,'west_count': west_count,
-            #            'north_speed': avg_north_speed,'north_count': north_count,
-            #            'south_speed': avg_south_speed,'south_count': south_count})
+            temp.append({'east_speed': avg_east_speed,'east_count': east_count,
+                         'west_speed': avg_west_speed,'west_count': west_count,
+                         'north_speed': avg_north_speed,'north_count': north_count,
+                         'south_speed': avg_south_speed,'south_count': south_count})
             #print(' temp:')
             #print('     ',temp)
 
-            nodes_features.append({ 'east_speed': avg_east_speed,'east_count': east_count,
-                                    'west_speed': avg_west_speed,'west_count': west_count,
-                                    'north_speed': avg_north_speed,'north_count': north_count,
-                                    'south_speed': avg_south_speed,'south_count': south_count},
-                                    ignore_index = True)
+            nodes_features = pd.DataFrame(temp, columns=nodes_features_coloumns, index=['TL'])
             #print(' nodes_features: ')
             #print('     ', nodes_features)
-            #traffic_features.append({'time_step':current_step, 'nodes_features': nodes_features},ignore_index= True)
+            traffic_features = traffic_features.append({'time_step':current_step, 'nodes_features': nodes_features},ignore_index= True)
             #print(' traffic_features: ')
             #print('     ', traffic_features)
 
-            #temp = []
+            temp = []
             east_speed = west_speed = north_speed = south_speed=0
             east_count = west_count = north_count = south_count=0
             current_step += 1
                 
 
-
-    print(' processed data: ', nodes_features)
-    nodes_features.to_csv(os.path.join('TrafficFeatures/traffic_features'+str(episode)+'.xml'), index=False)
+    print(' processing time: ', str(start_time - timeit.default_timer()))
+    print(' processed data: ', traffic_features)
+    traffic_features.to_csv(os.path.join('TrafficFeatures/traffic_features'+str(episode)+'.csv'), index=False)
     return nodes_features
 
 
