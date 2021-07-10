@@ -168,7 +168,7 @@ def data_split(dataset: pd.DataFrame, train_split, batch_size: int, prediction_s
 
 def read_data_from_xml(file_neme,episode):
     print(' reading file... ')
-    xml_data = open('Traci30k.xml','r').read()
+    xml_data = open(file_neme,'r').read()
     root =  et.XML(xml_data)
 
     db_colomns = ['time_step','speed','edge']
