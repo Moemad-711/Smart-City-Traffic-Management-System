@@ -5,6 +5,7 @@ import pandas as pd
 from sumolib import checkBinary
 import os
 import sys
+import xml.etree.ElementTree as et 
 
 def import_generate_data_configuration(config_file):
     """
@@ -164,3 +165,39 @@ def data_split(dataset: pd.DataFrame, train_split, batch_size: int, prediction_s
     y_val = y[batch_count_train+1:, :, :, :]
 
     return x_train, y_train, x_val, y_val
+
+def read_data_from_xml(file_neme,episode):
+    print(' reading file... ')
+    xml_data = open('Traci30k.xml','r').read()
+    root =  et.XML(xml_data)
+
+    db_colomns = ['time_step','speed','edge']
+    raws = []
+    ### Reading data from file ###
+    for node in root:
+        time_step = node.attrib.get("time")
+        for childnode in node:
+            vehicle_speed = childnode.attrib.get("speed")
+            vehicle_edge = childnode.attrib.get("edge")
+
+            if vehicle_edge in ['E2TL', 'W2TL', 'N2TL', 'S2TL']:
+                raws.append({'time_step':time_step, 
+                             'speed':vehicle_speed, 
+                             'edge':vehicle_edge})
+
+    ### Putting data in a dataframe ###                            
+    data = pd.DataFrame(raws, columns=db_colomns)
+    print(' raw data: ', data)
+    convert_dict = {'time_step':float,'speed':float,'edge':str}
+    data = data.astype(convert_dict)
+
+    ### Creating an empty dataframe for proccessed data ###
+    
+
+
+
+
+
+
+
+
