@@ -1,4 +1,5 @@
 from os import path
+import mpi4py
 import numpy as np
 import pandas as pd
 import os
@@ -9,16 +10,13 @@ from utils import data_split, read_data_from_xml
 
 
 if __name__ == "__main__":
-     
-    adjacency_matrix = [[0, 750, 750, 750, 750],
-                        [750, 0, 0, 0, 0],
-                        [750, 0, 0, 0, 0],
-                        [750, 0, 0, 0, 0],
-                        [750, 0, 0, 0, 0],]
 
-    x_train = y_train = x_val = y_val = np.zeros(100)
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    #size = comm.GET_size()
 
-    for index in range(100):
+    for index in range(80 + rank * 2, 80 + (rank * 2) + 2):
+        #print('hello from rank %i: '%(rank), index)
         #reading data form files
         print('----- Readinding from data%i -----' % (index))
         file_name = 'data' + str(index) + '.xml'
