@@ -203,14 +203,31 @@ def read_data_from_xml(file_neme,episode):
 
     current_step = 0
     temp = []
-    east_speed = west_speed = north_speed = south_speed=0
-    east_count = west_count = north_count = south_count=0
+    east_speed = west_speed = north_speed = south_speed = 0.0
+    east_count = west_count = north_count = south_count = 0.0
 
     ### Processing Data ###
     print(' processing data....')
     start_time = timeit.default_timer()
     raw_data_length = len(data)
     for i in range(raw_data_length):
+        if int(data.iloc[i]['time_step']) - int(current_step) > 1:
+            for k in range(int(current_step), int(data.iloc[i]['time_step'])):
+                temp.append({'east_speed': 0.0,'east_count': 0.0,
+                         'west_speed': 0.0,'west_count': 0.0,
+                         'north_speed': 0.0,'north_count': 0.0,
+                         'south_speed': 0.0,'south_count': 0.0})
+
+                nodes_features = pd.DataFrame(temp, columns=nodes_features_coloumns, index=['TL'])
+
+                traffic_features = traffic_features.append({'time_step':current_step, 'nodes_features': nodes_features},ignore_index= True)
+                temp = []
+                east_speed = west_speed = north_speed = south_speed = 0.0
+                east_count = west_count = north_count = south_count = 0.0
+                current_step += 1
+                if data.iloc[i]['time_step'] - current_step == 1:
+                    break
+            
         if data.iloc[i]['time_step'] == current_step:
 
             if data.iloc[i]['edge'] == "E2TL":    
@@ -228,7 +245,7 @@ def read_data_from_xml(file_neme,episode):
             if data.iloc[i]['edge'] =="S2TL":
                 south_speed += data.iloc[i]['speed']
                 south_count += 1
-        
+            
         else:
             avg_east_speed = avg_west_speed = avg_north_speed = avg_south_speed = 0.0
                 
@@ -259,12 +276,28 @@ def read_data_from_xml(file_neme,episode):
             #print('     ', traffic_features)
 
             temp = []
-            east_speed = west_speed = north_speed = south_speed=0
-            east_count = west_count = north_count = south_count=0
-            current_step += 1
+            east_speed = west_speed = north_speed = south_speed = 0.0
+            east_count = west_count = north_count = south_count = 0.0
+            current_step+=1
+
+            if data.iloc[i]['edge'] == "E2TL":    
+                east_speed += data.iloc[i]['speed']
+                east_count += 1
+
+            if data.iloc[i]['edge'] =="W2TL":
+                west_speed += data.iloc[i]['speed']
+                west_count += 1
+
+            if data.iloc[i]['edge'] =="N2TL":
+                north_speed += data.iloc[i]['speed']
+                north_count += 1
+
+            if data.iloc[i]['edge'] =="S2TL":
+                south_speed += data.iloc[i]['speed']
+                south_count += 1
                 
 
-    print(' processing time: ', str(start_time - timeit.default_timer()))
+    print(' processing time: ', str(timeit.default_timer() - start_time))
     print(' processed data: ', traffic_features)
     traffic_features.to_csv(os.path.join('TrafficFeatures/traffic_features'+str(episode)+'.csv'), index=False)
     return nodes_features
