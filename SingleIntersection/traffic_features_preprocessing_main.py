@@ -6,14 +6,13 @@ import os
 from mpi4py import MPI
 
 from PredictiveModel import PredictiveModel
-from utils import data_split, read_data_from_xml
+from utils import  read_data_from_xml
 
 
 if __name__ == "__main__":
 
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
-    #size = comm.GET_size()
 
     for index in range(80 + rank * 2, 80 + (rank * 2) + 2):
         #print('hello from rank %i: '%(rank), index)
