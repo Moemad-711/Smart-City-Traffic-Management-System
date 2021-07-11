@@ -2,6 +2,7 @@ from os import path
 import numpy as np
 import pandas as pd
 import os
+from mpi4py import MPI
 
 from PredictiveModel import PredictiveModel
 from utils import data_split, read_data_from_xml
