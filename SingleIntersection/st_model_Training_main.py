@@ -1,6 +1,7 @@
 from datetime import time
 from os import path
 import timeit
+from traceback import print_tb
 import numpy as np
 import pandas as pd
 import os
@@ -41,6 +42,7 @@ if __name__ == "__main__":
                                                      config['batch_size'], 
                                                      config['prediction_steps'])
         print('input_shape', x_train.shape)
+        print('val_shape', x_val.shape)
         print(' training model on features %i...' %(index))
         model.train_model(x_train, y_train, x_val,  y_val,epochs=config['training_epochs'])
     
