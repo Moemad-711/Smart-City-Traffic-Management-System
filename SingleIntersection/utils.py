@@ -362,6 +362,154 @@ def read_data_from_xml(file_neme,episode):
     traffic_features.to_csv(os.path.join(path,'traffic_features'+str(episode)+'.csv'), index=False)
     return traffic_features
 
+def read_data_from_xml_mpi(file_neme, episode, comm, rank):
+    print(' reading file... ')
+    if rank == 0:
+        path = set_traffic_features_path('TrafficFeatures')
+    else:
+        path = None
+
+    path = comm.bcast(path, root=0)
+    xml_data = open(os.path.join(file_neme),'r').read()
+    root =  et.XML(xml_data)
+
+    db_colomns = ['time_step','speed','edge']
+    raws = []
+    ### Reading data from file ###
+    for node in root:
+        time_step = node.attrib.get("time")
+        for childnode in node:
+            vehicle_speed = childnode.attrib.get("speed")
+            vehicle_edge = childnode.attrib.get("edge")
+
+            if vehicle_edge in ['E2TL', 'W2TL', 'N2TL', 'S2TL']:
+                raws.append({'time_step':time_step, 
+                             'speed':vehicle_speed, 
+                             'edge':vehicle_edge})
+
+    ### Putting data in a dataframe ###                            
+    data = pd.DataFrame(raws, columns=db_colomns)
+    print(' raw data: \n', data)
+    convert_dict = {'time_step':float,'speed':float,'edge':str}
+    data = data.astype(convert_dict)
+
+    ### Creating an empty dataframe for proccessed data ###
+    #nodes_features_coloumns = [ 'east_speed','east_count',
+    #                           'west_speed','west_count',
+    #                            'north_speed','north_count',
+    #                           'south_speed','south_count']
+    #nodes_features = None
+    traffic_features = pd.DataFrame(columns=['time_step','east_speed','east_count',
+                                'west_speed','west_count',
+                                'north_speed','north_count',
+                               'south_speed','south_count'])
+
+    current_step = 0
+    #temp = []
+    east_speed = west_speed = north_speed = south_speed = 0.0
+    east_count = west_count = north_count = south_count = 0.0
+
+    ### Processing Data ###
+    print(' processing data....')
+    start_time = timeit.default_timer()
+    raw_data_length = len(data)
+    for i in range(raw_data_length):
+        if int(data.iloc[i]['time_step']) - int(current_step) > 1:
+            for k in range(int(current_step), int(data.iloc[i]['time_step'])):
+                #temp.append({'east_speed': 0.0,'east_count': 0.0,
+                #         'west_speed': 0.0,'west_count': 0.0,
+                #         'north_speed': 0.0,'north_count': 0.0,
+                #         'south_speed': 0.0,'south_count': 0.0})
+
+                #nodes_features = pd.DataFrame(temp, columns=nodes_features_coloumns, index=['TL'])
+
+                traffic_features = traffic_features.append({'time_step':current_step, 
+                                                            'east_speed': 0.0,'east_count': 0.0,
+                                                            'west_speed': 0.0,'west_count': 0.0,
+                                                            'north_speed': 0.0,'north_count': 0.0,
+                                                            'south_speed': 0.0,'south_count': 0.0},
+                                                            ignore_index= True)
+                #temp = []
+                east_speed = west_speed = north_speed = south_speed = 0.0
+                east_count = west_count = north_count = south_count = 0.0
+                current_step += 1
+                if data.iloc[i]['time_step'] - current_step == 1:
+                    break
+            
+        if data.iloc[i]['time_step'] == current_step:
+
+            if data.iloc[i]['edge'] == "E2TL":    
+                east_speed += data.iloc[i]['speed']
+                east_count += 1
+
+            if data.iloc[i]['edge'] =="W2TL":
+                west_speed += data.iloc[i]['speed']
+                west_count += 1
+
+            if data.iloc[i]['edge'] =="N2TL":
+                north_speed += data.iloc[i]['speed']
+                north_count += 1
+
+            if data.iloc[i]['edge'] =="S2TL":
+                south_speed += data.iloc[i]['speed']
+                south_count += 1
+            
+        else:
+            avg_east_speed = avg_west_speed = avg_north_speed = avg_south_speed = 0.0
+                
+            if east_count != 0:
+                avg_east_speed = east_speed/east_count
+            
+            if west_count != 0:
+                avg_west_speed = west_speed/west_count
+            
+            if north_count != 0:
+                avg_north_speed = north_speed/north_count
+
+            if south_count != 0:
+                avg_south_speed = south_speed/south_count
+            
+            #temp.append({'east_speed': avg_east_speed,'east_count': east_count,
+            #             'west_speed': avg_west_speed,'west_count': west_count,
+            #             'north_speed': avg_north_speed,'north_count': north_count,
+            #             'south_speed': avg_south_speed,'south_count': south_count})
+
+            #nodes_features = pd.DataFrame(temp, columns=nodes_features_coloumns, index=['TL'])
+
+            traffic_features = traffic_features.append({'time_step':current_step, 
+                                                        'east_speed': avg_east_speed,'east_count': east_count,
+                                                        'west_speed': avg_west_speed,'west_count': west_count,
+                                                        'north_speed': avg_north_speed,'north_count': north_count,
+                                                        'south_speed': avg_south_speed,'south_count': south_count},
+                                                        ignore_index= True)
+
+            #temp = []
+            east_speed = west_speed = north_speed = south_speed = 0.0
+            east_count = west_count = north_count = south_count = 0.0
+            current_step+=1
+
+            if data.iloc[i]['edge'] == "E2TL":    
+                east_speed += data.iloc[i]['speed']
+                east_count += 1
+
+            if data.iloc[i]['edge'] =="W2TL":
+                west_speed += data.iloc[i]['speed']
+                west_count += 1
+
+            if data.iloc[i]['edge'] =="N2TL":
+                north_speed += data.iloc[i]['speed']
+                north_count += 1
+
+            if data.iloc[i]['edge'] =="S2TL":
+                south_speed += data.iloc[i]['speed']
+                south_count += 1
+                
+
+    print(' processing time: ', str(timeit.default_timer() - start_time))
+    print(' processed data: ', traffic_features)
+    traffic_features.to_csv(os.path.join(path,'traffic_features'+str(episode)+'.csv'), index=False)
+    return traffic_features
+
 
 
 
