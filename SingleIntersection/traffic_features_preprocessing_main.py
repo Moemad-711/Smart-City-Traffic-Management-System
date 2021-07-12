@@ -28,7 +28,7 @@ if __name__ == "__main__":
     output_path = comm.bcast(output_path, root=0)
 
     for index in range(rank * math.ceil(episode_count/size), (rank * math.ceil(episode_count/size)) + math.ceil(episode_count/size)):
-        # Reading data form files
+        ##### Reading data form files #####
         if index >= episode_count:
             break
 
