@@ -13,7 +13,7 @@ if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
 
-    for index in range(rank * 2, (rank * 2) + 3):
+    for index in range(rank * 3, (rank * 3) + 3):
         #reading data form files
         if index >= 100:
             break
