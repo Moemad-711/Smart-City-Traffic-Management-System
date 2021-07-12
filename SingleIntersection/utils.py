@@ -112,6 +112,23 @@ def set_sumo(gui, sumocfg_file_name, max_steps):
 
     return sumo_cmd
 
+def set_raw_traffic_data_path(traffic_data_path_name):
+    """
+    Create a new model path with an incremental integer, also considering previously created model paths
+    """
+    traffic_data_path = os.path.join(os.getcwd(), traffic_data_path_name, '')
+    os.makedirs(os.path.dirname(traffic_data_path), exist_ok=True)
+
+    dir_content = os.listdir(traffic_data_path)
+    if dir_content:
+        previous_versions = [int(name.split("_")[1]) for name in dir_content]
+        new_version = str(max(previous_versions) + 1)
+    else:
+        new_version = '1'
+
+    data_path = os.path.join(traffic_data_path, 'traffic_data_'+new_version, '')
+    os.makedirs(os.path.dirname(data_path), exist_ok=True)
+    return data_path
 
 def set_train_path(models_path_name):
     """
