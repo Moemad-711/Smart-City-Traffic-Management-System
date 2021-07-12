@@ -362,14 +362,8 @@ def read_data_from_xml(file_neme,episode):
     traffic_features.to_csv(os.path.join(path,'traffic_features'+str(episode)+'.csv'), index=False)
     return traffic_features
 
-def read_data_from_xml_mpi(file_neme, episode, comm, rank):
+def read_data_from_xml_mpi(file_neme, episode, output_path):
     print(' reading file... ')
-    if rank == 0:
-        path = set_traffic_features_path('TrafficFeatures')
-    else:
-        path = None
-
-    path = comm.bcast(path, root=0)
     xml_data = open(os.path.join(file_neme),'r').read()
     root =  et.XML(xml_data)
 
@@ -507,7 +501,7 @@ def read_data_from_xml_mpi(file_neme, episode, comm, rank):
 
     print(' processing time: ', str(timeit.default_timer() - start_time))
     print(' processed data: ', traffic_features)
-    traffic_features.to_csv(os.path.join(path,'traffic_features'+str(episode)+'.csv'), index=False)
+    traffic_features.to_csv(os.path.join(output_path,'traffic_features'+str(episode)+'.csv'), index=False)
     return traffic_features
 
 
