@@ -4,6 +4,7 @@ import timeit
 import numpy as np
 
 import pandas as pd
+from tensorflow.python.keras.backend import random_uniform
 from sumolib import checkBinary
 import os
 import sys
@@ -20,7 +21,7 @@ def import_st_model_train_configuration(config_file):
     config['batch_size'] = content['model'].getint('batch_size')
     config['train_split'] = content['model'].getfloat('train_split')
     config['training_epochs'] = content['model'].getint('training_epochs')
-    config['traffic_feature_folder_num'] = content['dir']['traffic_feature_folder_num']
+    config['traffic_feature_folder_num'] = content['dir'].getint('traffic_feature_folder_num')
     config['models_path_name'] = content['dir']['models_path_name']
     return config
  
@@ -216,7 +217,7 @@ def data_split(dataset: pd.DataFrame, train_split, batch_size: int, prediction_s
     y_train = y[:batch_count_train, :, :, :]
     x_val = x[batch_count_train+1:, :, :, :]
     y_val = y[batch_count_train+1:, :, :, :]
-
+  
     return x_train, y_train, x_val, y_val
 
 def read_data_from_xml(file_neme,episode):
