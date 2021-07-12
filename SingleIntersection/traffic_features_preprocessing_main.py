@@ -37,8 +37,3 @@ if __name__ == "__main__":
         traffic_data = []
         traffic_data.append(read_data_from_xml_mpi(os.path.join(path, file_name), index, output_path))
         #traffic_data.append(read_data_from_xml(os.path.join(path, file_name), index))
-    
-    
-
-
-
