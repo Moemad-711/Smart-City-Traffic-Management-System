@@ -1,5 +1,6 @@
 from datetime import time
 from os import path
+import timeit
 import numpy as np
 import pandas as pd
 import os
@@ -25,29 +26,26 @@ if __name__ == "__main__":
                             batch_size=config['batch_size'], 
                             prediction_steps=config['prediction_steps'])
                         
-    #traffic_features = []
-    #x_train = y_train =  x_val =  y_val = []
+    start_time = timeit.default_timer()
 
     for index in range(100):
         ### Reading Traffic information ###
         print('----- Reading From traffic features %i -----' % (index)) 
         file_name = 'traffic_features' + str(index) + '.csv'
         traffic_features = pd.read_csv(os.path.join('TrafficFeatures',file_name))
-        time_steps = traffic_features['time_step']
-        nodes_features = pd.DataFrame(traffic_features['nodes_features'],)
-        print('nodes_features: ')
-        print(nodes_features.head())
 
         ### Splitting Data ###
-        #print(' spliting data...')
-        #x_train, y_train, x_val,  y_val = data_split(time_steps, 
-        #                                             config['train_split'], 
-        #                                             config['batch_size'], 
-        #                                             config['prediction_steps'])
-        #print(' training model on features %i...' %(index))
-        #model.train_model(x_train, y_train, x_val,  y_val)
-
-    #model.save_model(path)
+        print(' spliting data...')
+        x_train, y_train, x_val,  y_val = data_split(traffic_features.iloc[:,1:], 
+                                                     config['train_split'], 
+                                                     config['batch_size'], 
+                                                     config['prediction_steps'])
+        print('input_shape', x_train.shape)
+        print(' training model on features %i...' %(index))
+        model.train_model(x_train, y_train, x_val,  y_val,epochs=config['training_epochs'])
+    
+    print(' Total Training Time: ', str(timeit.default_timer() - start_time))
+    model.save_model(path)
 
 
 
