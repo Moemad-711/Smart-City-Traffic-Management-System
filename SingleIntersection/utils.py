@@ -35,6 +35,7 @@ def import_generate_data_configuration(config_file):
     config['total_episodes'] = content['simulation'].getint('total_episodes')
     config['max_steps'] = content['simulation'].getint('max_steps')
     config['n_cars_generated'] = content['simulation'].getint('n_cars_generated')
+    config['traffic_data_path_name'] = content['dir']['traffic_data_path_name']
     config['sumocfg_file_name'] = content['dir']['sumocfg_file_name']
     return config
 
@@ -121,7 +122,7 @@ def set_raw_traffic_data_path(traffic_data_path_name):
 
     dir_content = os.listdir(traffic_data_path)
     if dir_content:
-        previous_versions = [int(name.split("_")[1]) for name in dir_content]
+        previous_versions = [int(name.split("_")[2]) for name in dir_content]
         new_version = str(max(previous_versions) + 1)
     else:
         new_version = '1'
