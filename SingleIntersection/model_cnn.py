@@ -21,19 +21,6 @@ class TrainModel:
         self._model = self._build_model(num_layers, width)
 
 
-    # def _build_model(self, num_layers, width):
-    #     """
-    #     Build and compile a fully connected deep neural network
-    #     """
-    #     inputs = keras.Input(shape=(self._input_dim,)) # 80
-    #     x = layers.Dense(width, activation='relu')(inputs)
-    #     for _ in range(num_layers):
-    #         x = layers.Dense(width, activation='relu')(x)
-    #     outputs = layers.Dense(self._output_dim, activation='linear')(x)
-
-    #     model = keras.Model(inputs=inputs, outputs=outputs, name='my_model')
-    #     model.compile(loss=losses.mean_squared_error, optimizer=Adam(lr=self._learning_rate))
-    #     return model
     def _build_model(self, num_layers, width):
         """
         Build and compile a fully connected deep neural network
