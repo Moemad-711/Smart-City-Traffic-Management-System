@@ -134,7 +134,7 @@ class PredictiveModel:
         """
         Load the model stored in the folder specified by the model number, if it exists
         """
-        model_file_path = os.path.join(model_folder_path, 'trained_model.h5')
+        model_file_path = os.path.join(model_folder_path, 'trained_predictive_model.h5')
         
         if os.path.isfile(model_file_path):
             loaded_model = load_model(model_file_path)
