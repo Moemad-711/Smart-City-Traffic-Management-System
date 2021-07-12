@@ -1,4 +1,6 @@
 import os
+
+from numpy.core.fromnumeric import shape
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'  # kill warning about tensorflow
 import sys 
 
@@ -141,6 +143,29 @@ class PredictiveModel:
             self.model = loaded_model
         else:
             sys.exit("Model number not found")
+
+class TestPredictiveModel:
+    def __init__(self, adjacency_matrix, model_path):
+        self.adjacency_matrix = adjacency_matrix
+        self.model = self.load_my_model(model_path)
+
+
+    def load_my_model(self, model_folder_path):
+        """
+        Load the model stored in the folder specified by the model number, if it exists
+        """
+        model_file_path = os.path.join(model_folder_path, 'trained_predictive_model.h5')
+        
+        if os.path.isfile(model_file_path):
+            loaded_model = load_model(model_file_path)
+            return loaded_model
+        else:
+            sys.exit("Model number not found")
+    
+    def predict_one(self,input_x):
+
+        a_repeated = np.tile(self.adjacency_matrix, (input_x.shape[0],len(self.adjacency_matrix),len(self.adjacency_matrix[0])))
+        return self.model.predict(input_x,a_repeated)
 
 
     
