@@ -18,9 +18,10 @@ if __name__ == "__main__":
         if index >= 100:
             break
         print('----- Readinding from data%i -----' % (index))
+        path = os.path.join('TrafficData','traffic_data_%i' % (2))
         file_name = 'data' + str(index) + '.xml'
         traffic_data = []
-        traffic_data.append(read_data_from_xml(file_name,index))
+        traffic_data.append(read_data_from_xml(os.path.join(path, file_name), index))
     
     
 
