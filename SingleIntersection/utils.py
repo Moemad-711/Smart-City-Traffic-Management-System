@@ -217,9 +217,8 @@ def data_split(dataset: pd.DataFrame, train_split, batch_size: int, prediction_s
     y_train = y[:batch_count_train, :, :, :]
     x_val = x[batch_count_train+1:, :, :, :]
     y_val = y[batch_count_train+1:, :, :, :]
-    
-    return x,y
-    #return x_train, y_train, x_val, y_val
+  
+    return x_train, y_train, x_val, y_val
 
 def read_data_from_xml(file_neme,episode):
     print(' reading file... ')

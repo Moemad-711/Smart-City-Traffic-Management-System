@@ -37,14 +37,14 @@ if __name__ == "__main__":
 
         ### Splitting Data ###
         print(' spliting data...')
-        x_train, y_train= data_split(traffic_features.iloc[:,1:], 
+        x_train, y_train, x_val,  y_val = data_split(traffic_features.iloc[:,1:], 
                                                      config['train_split'], 
                                                      config['batch_size'], 
                                                      config['prediction_steps'])
         print('input_shape', x_train.shape)
-        #print('val_shape', x_val.shape)
+        print('val_shape', x_val.shape)
         print(' training model on features %i...' %(index))
-        model.train_model(x_train, y_train, .3,epochs=config['training_epochs'])
+        model.train_model(x_train, y_train, x_val,  y_val,epochs=config['training_epochs'])
     
     print(' Total Training Time: ', str(timeit.default_timer() - start_time))
     model.save_model(path)

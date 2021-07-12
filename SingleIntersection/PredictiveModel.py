@@ -110,17 +110,16 @@ class PredictiveModel:
 
         return model
 
-    def train_model(self, x_train, y_train, val_split, epochs):
+    def train_model(self, x_train, y_train, x_val, y_val, epochs):
         """
         Train the Predictive Model
         """
         a_train_repeated = np.tile(self.adjacency_matrix, (x_train.shape[0],1,1))
         print(a_train_repeated.shape)
 
-        #a_test_repeated = np.tile(self.adjacency_matrix, (x_val.shape[0],1,1))
+        a_test_repeated = np.tile(self.adjacency_matrix, (x_val.shape[0],1,1))
 
-        #history = self.model.fit(x=[x_train, a_train_repeated],y=y_train, batch_size=1,epochs=epochs,validation_data=([x_val,a_test_repeated],y_val))
-        history = self.model.fit(x=[x_train, a_train_repeated],y=y_train, batch_size=1,epochs=epochs, validation_split=val_split)
+        history = self.model.fit(x=[x_train, a_train_repeated],y=y_train, batch_size=1,epochs=epochs,validation_data=([x_val,a_test_repeated],y_val))
         print(history)
      
     def save_model(self, path):
