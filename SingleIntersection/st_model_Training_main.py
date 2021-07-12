@@ -29,7 +29,7 @@ if __name__ == "__main__":
                         
     start_time = timeit.default_timer()
 
-    for index in range(100):
+    for index in range(99):
         ### Reading Traffic information ###
         print('----- Reading From traffic features %i -----' % (index)) 
         file_name = 'traffic_features' + str(index) + '.csv'
