@@ -20,6 +20,7 @@ def import_st_model_train_configuration(config_file):
     config['batch_size'] = content['model'].getint('batch_size')
     config['train_split'] = content['model'].getfloat('train_split')
     config['training_epochs'] = content['model'].getint('training_epochs')
+    config['traffic_feature_folder_num'] = content['dir']['traffic_feature_folder_num']
     config['models_path_name'] = content['dir']['models_path_name']
     return config
  
@@ -131,6 +132,24 @@ def set_raw_traffic_data_path(traffic_data_path_name):
     os.makedirs(os.path.dirname(data_path), exist_ok=True)
     return data_path
 
+def set_traffic_features_path(traffic_features_path_name):
+    """
+    Create a new model path with an incremental integer, also considering previously created model paths
+    """
+    traffic_features_path = os.path.join(os.getcwd(), traffic_features_path_name, '')
+    os.makedirs(os.path.dirname(traffic_features_path), exist_ok=True)
+
+    dir_content = os.listdir(traffic_features_path)
+    if dir_content:
+        previous_versions = [int(name.split("_")[2]) for name in dir_content]
+        new_version = str(max(previous_versions) + 1)
+    else:
+        new_version = '1'
+
+    data_path = os.path.join(traffic_features_path, 'traffic_features_'+new_version, '')
+    os.makedirs(os.path.dirname(data_path), exist_ok=True)
+    return data_path
+
 def set_train_path(models_path_name):
     """
     Create a new model path with an incremental integer, also considering previously created model paths
@@ -202,7 +221,8 @@ def data_split(dataset: pd.DataFrame, train_split, batch_size: int, prediction_s
 
 def read_data_from_xml(file_neme,episode):
     print(' reading file... ')
-    xml_data = open(os.path.join('TrafficData/'+file_neme),'r').read()
+    path = set_traffic_features_path('TrafficFeatures')
+    xml_data = open(os.path.join(file_neme),'r').read()
     root =  et.XML(xml_data)
 
     db_colomns = ['time_step','speed','edge']
@@ -339,7 +359,7 @@ def read_data_from_xml(file_neme,episode):
 
     print(' processing time: ', str(timeit.default_timer() - start_time))
     print(' processed data: ', traffic_features)
-    traffic_features.to_csv(os.path.join('TrafficFeatures/traffic_features'+str(episode)+'.csv'), index=False)
+    traffic_features.to_csv(os.path.join(path,'traffic_features'+str(episode)+'.csv'), index=False)
     return traffic_features
 
 
