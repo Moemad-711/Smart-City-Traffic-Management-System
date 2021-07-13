@@ -8,7 +8,8 @@ from shutil import copyfile
 from training_simulation import Simulation
 from generator import TrafficGenerator
 from memory import Memory
-from model import TrainModel
+from model_cnn import TrainModel
+#from model import TrainModel
 from visualization import Visualization
 from utils import import_train_configuration, set_sumo, set_train_path
 
@@ -32,6 +33,10 @@ if __name__ == "__main__":
         config['memory_size_max'], 
         config['memory_size_min']
     )
+
+    #TODO: Create an ST_Model(GNN) Object 
+
+    #TODO: Create A memory for the ST_Model(GNN)
 
     TrafficGen = TrafficGenerator(
         config['max_steps'], 
