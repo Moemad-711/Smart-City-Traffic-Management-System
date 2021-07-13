@@ -45,7 +45,7 @@ if __name__ == "__main__":
     )
 
     #Create A memory for the ST_Model(GNN)
-    ST_Memory=Memory(
+    st_memory=Memory(
         config['st_memory_size_max'], 
         config['st_memory_size_min'])
 
@@ -61,7 +61,9 @@ if __name__ == "__main__":
         
     Simulation = Simulation(
         Model,
+        st_model,
         Memory,
+        st_memory,
         TrafficGen,
         sumo_cmd,
         config['gamma'],
