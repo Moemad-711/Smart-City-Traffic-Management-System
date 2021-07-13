@@ -157,9 +157,9 @@ class Simulation:
         Returns The Minimum of current demand and future demand Greenlight Times
         """
         greenlight_time = None
-
+    
         return greenlight_time
-        
+
     def _set_yellow_phase(self, old_action):
         """
         Activate the correct yellow light combination in sumo
