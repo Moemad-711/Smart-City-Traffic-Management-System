@@ -28,6 +28,7 @@ class Memory:
         else:
             return random.sample(self._samples, n)  # get "batch size" number of samples
 
+    #TODO: Implement Method to return last N(time_steps) smaples 
 
     def _size_now(self):
         """

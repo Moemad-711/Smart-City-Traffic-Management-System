@@ -79,6 +79,8 @@ class Simulation:
 
             # execute the phase selected before
             self._set_green_phase(action)
+            # TODO: Call Method to Evaluate Greenlight Time
+
             self._simulate(self._green_duration)
 
             # saving variables for later & accumulate reward
@@ -149,7 +151,15 @@ class Simulation:
         else:
             return np.argmax(self._Model.predict_one(state)) # the best action given the current state
 
+    #TODO: Write method to get the Greenlight Time
+    def get_greenlight_time(self): 
+        """
+        Returns The Minimum of current demand and future demand Greenlight Times
+        """
+        greenlight_time = None
 
+        return greenlight_time
+        
     def _set_yellow_phase(self, old_action):
         """
         Activate the correct yellow light combination in sumo

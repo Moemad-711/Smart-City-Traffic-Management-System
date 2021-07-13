@@ -162,9 +162,10 @@ class TestPredictiveModel:
         else:
             sys.exit("Model number not found")
     
-    def predict_one(self,input_x):
+    def predict_one(self,input_x): 
 
         a_repeated = np.tile(self.adjacency_matrix, (input_x.shape[0],len(self.adjacency_matrix),len(self.adjacency_matrix[0])))
+
         return self.model.predict(input_x,a_repeated)
 
 
