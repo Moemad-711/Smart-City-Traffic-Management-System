@@ -37,7 +37,7 @@ if __name__ == "__main__":
     #Create an ST_Model(GNN) Object 
     st_model=TestPredictiveModel(
          adjacency_matrix, 
-        config['models_path_name'])
+        'st_models\model_25')
         
     Memory = Memory(
         config['memory_size_max'], 
