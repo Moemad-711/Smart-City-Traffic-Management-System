@@ -16,9 +16,11 @@ PHASE_EWL_YELLOW = 7
 
 
 class Simulation:
-    def __init__(self, Model, Memory, TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_actions, training_epochs):
+    def __init__(self, Model,st_model,Memory, st_meomry,TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_actions, training_epochs):
         self._Model = Model
+        self.st_model=st_model
         self._Memory = Memory
+        self.st_meomry=st_meomry
         self._TrafficGen = TrafficGen
         self._gamma = gamma
         self._step = 0

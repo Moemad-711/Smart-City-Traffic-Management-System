@@ -4,7 +4,7 @@ from __future__ import print_function
 import os
 import datetime
 from shutil import copyfile
-
+from PredictiveModel import PredictiveModel, TestPredictiveModel
 from training_simulation import Simulation
 from generator import TrafficGenerator
 from memory import Memory
@@ -17,6 +17,12 @@ from utils import import_train_configuration, set_sumo, set_train_path
 if __name__ == "__main__":
 
     config = import_train_configuration(config_file='training_settings.ini')
+    st_config = import_train_configuration(config_file='st_model_training_settings.ini')
+    adjacency_matrix = [[0, 750, 750, 750, 750],
+                        [750, 0, 0, 0, 0],
+                        [750, 0, 0, 0, 0],
+                        [750, 0, 0, 0, 0],
+                        [750, 0, 0, 0, 0],]
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
     path = set_train_path(config['models_path_name'])
 
@@ -28,15 +34,20 @@ if __name__ == "__main__":
         input_dim=config['num_states'], 
         output_dim=config['num_actions']
     )
-
+    #Create an ST_Model(GNN) Object 
+    st_model=TestPredictiveModel(
+         adjacency_matrix, 
+        'st_models\model_25')
+        
     Memory = Memory(
         config['memory_size_max'], 
         config['memory_size_min']
     )
 
-    #TODO: Create an ST_Model(GNN) Object 
-
-    #TODO: Create A memory for the ST_Model(GNN)
+    #Create A memory for the ST_Model(GNN)
+    st_memory=Memory(
+        config['st_memory_size_max'], 
+        config['st_memory_size_min'])
 
     TrafficGen = TrafficGenerator(
         config['max_steps'], 
@@ -50,7 +61,9 @@ if __name__ == "__main__":
         
     Simulation = Simulation(
         Model,
+        st_model,
         Memory,
+        st_memory,
         TrafficGen,
         sumo_cmd,
         config['gamma'],
