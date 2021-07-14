@@ -7,9 +7,9 @@ from shutil import copyfile
 from PredictiveModel import PredictiveModel, TestPredictiveModel
 from training_simulation import Simulation
 from generator import TrafficGenerator
-from memory import Memory
-from model_cnn import TrainModel
-#from model import TrainModel
+from memory import Memory, ST_Memory
+#from model_cnn import TrainModel
+from model import TrainModel
 from visualization import Visualization
 from utils import import_train_configuration, set_sumo, set_train_path
 
@@ -45,9 +45,9 @@ if __name__ == "__main__":
     )
 
     #Create A memory for the ST_Model(GNN)
-    st_memory=Memory(
-        config['st_memory_size_max'], 
-        config['st_memory_size_min'])
+    st_memory=ST_Memory(
+        config['st_memory_size'], 
+        (9,1,8))
 
     TrafficGen = TrafficGenerator(
         config['max_steps'], 

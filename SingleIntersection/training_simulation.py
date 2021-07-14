@@ -1,3 +1,7 @@
+from numpy.lib.arraysetops import intersect1d
+from numpy.lib.function_base import average
+import pandas as pd
+from libsumo.libsumo import edge_getIDList, vehicle
 import traci
 import numpy as np
 import random
@@ -14,13 +18,22 @@ PHASE_EW_YELLOW = 5
 PHASE_EWL_GREEN = 6  # action 3 code 11
 PHASE_EWL_YELLOW = 7
 
+# Lanes List
+N_Straight = ['N2TL_0', 'N2TL_1', 'N2TL_2']
+N_left = ['N2TL_3']
+S_Straight = ['S2TL_0', 'S2TL_1', 'S2TL_2']
+S_left = ['S2TL_3']
+W_Straight = ['W2TL_0', 'W2TL_1', 'W2TL_2']
+W_left = ['W2TL_3']
+E_Straight = ['E2TL_0', 'E2TL_1', 'E2TL_2']
+E_left = ['E2TL_3']
 
 class Simulation:
     def __init__(self, Model,st_model,Memory, st_meomry,TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_actions, training_epochs):
         self._Model = Model
-        self.st_model=st_model
+        self._st_model=st_model
         self._Memory = Memory
-        self.st_meomry=st_meomry
+        self._st_meomry=st_meomry
         self._TrafficGen = TrafficGen
         self._gamma = gamma
         self._step = 0
@@ -70,6 +83,34 @@ class Simulation:
             # saving the data into the memory
             if self._step != 0:
                 self._Memory.add_sample((old_state, old_action, reward, current_state))
+
+            # saving traffic features to st_memory                
+            north_speed = traci.edge.getLastStepMeanSpeed('N2TL')
+            north_count = traci.edge.getLastStepVehicleNumber('N2TL')
+
+            south_speed = traci.edge.getLastStepMeanSpeed('S2TL')
+            south_count = traci.edge.getLastStepVehicleNumber('S2TL')
+
+            west_speed = traci.edge.getLastStepMeanSpeed('W2TL')
+            west_count = traci.edge.getLastStepVehicleNumber('W2TL')
+
+            east_speed = traci.edge.getLastStepMeanSpeed('E2TL')
+            east_count = traci.edge.getLastStepVehicleNumber('E2TL')
+            
+            sample_dict = pd.DataFrame({  'time_step':self._step, 
+                            'east_speed': west_speed,'east_count': east_count,
+                            'west_speed': east_speed,'west_count': west_count,
+                            'north_speed': north_speed,'north_count': north_count,
+                            'south_speed': south_speed,'south_count': south_count},
+                            columns=['time_step',
+                                     'east_speed','east_count',
+                                     'west_speed','west_count',
+                                     'north_speed','north_count',
+                                     'south_speed','south_count'])
+            
+            sample = sample_dict.to_numpy()
+            self._st_meomry.add_sample(sample)
+
 
             # choose the light phase to activate, based on the current state of the intersection
             action = self._choose_action(current_state, epsilon)
@@ -154,13 +195,121 @@ class Simulation:
             return np.argmax(self._Model.predict_one(state)) # the best action given the current state
 
     #TODO: Write method to get the Greenlight Time
-    def get_greenlight_time(self): 
+    def get_green_duration(self,action): 
         """
         Returns The Minimum of current demand and future demand Greenlight Times
         """
-        greenlight_time = None
-    
-        return greenlight_time
+        #current_demand_green_duration = None
+        #future_demand_green_duration = None
+        green_duration = []
+
+        ##### Get Current Demand Green Duration #####
+        if action == 0:
+            intersection_length = traci.lane.getLength('TL_1_0')
+            ### N2TL Duration ###
+            N_avg_speed = Sum([traci.lane.getLastStepMeanSpeed(lane) for lane in N_Straight])/3
+            N_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in N_Straight])
+            N_single_car_time = intersection_length/N_avg_speed
+            #N_green_duration = N_single_car_time * N_vehicle_count
+            green_duration.append(N_single_car_time * N_vehicle_count)
+            
+            ### S2TL Duration ###
+            S_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in S_Straight])/3
+            S_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in S_Straight])
+            S_single_car_time = intersection_length/S_avg_speed
+            #N_green_duration = N_single_car_time * N_vehicle_count
+            green_duration.append(S_single_car_time * S_vehicle_count)
+
+        elif action == 1:
+            intersection_length = traci.lane.getLength('TL_10_0')
+            ### N2TL Duration ###
+            N_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in N_left])
+            N_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in N_left])
+            N_single_car_time = intersection_length/N_avg_speed
+            #N_green_duration = N_single_car_time * N_vehicle_count
+            green_duration.append(N_single_car_time * N_vehicle_count)
+
+            ### S2TL Duration ###
+            S_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in S_left])
+            S_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in S_left])
+            S_single_car_time = intersection_length/S_avg_speed
+            #N_green_duration = N_single_car_time * N_vehicle_count
+            green_duration.append(S_single_car_time * S_vehicle_count)
+
+        elif action == 2:
+            intersection_length = traci.lane.getLength('TL_1_0')
+            ### N2TL Duration ###
+            W_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in W_Straight])/3
+            W_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in W_Straight])
+            W_single_car_time = intersection_length/W_avg_speed
+            #N_green_duration = N_single_car_time * N_vehicle_count
+            green_duration.append(W_single_car_time * W_vehicle_count)
+
+            ### S2TL Duration ###
+            E_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in E_Straight])/3
+            E_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in E_Straight])
+            E_single_car_time = intersection_length/E_avg_speed
+            #N_green_duration = N_single_car_time * N_vehicle_count
+            green_duration.append(E_single_car_time * E_vehicle_count)
+
+        elif action == 3:
+            intersection_length = traci.lane.getLength('TL_10_0')
+            ### N2TL Duration ###
+            W_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in W_left])
+            W_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in W_left])
+            W_single_car_time = intersection_length/W_avg_speed
+            #N_green_duration = N_single_car_time * N_vehicle_count
+            green_duration.append(W_single_car_time * W_vehicle_count)
+
+            ### S2TL Duration ###
+            E_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in E_left])
+            E_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in E_left])
+            E_single_car_time = intersection_length/E_avg_speed
+            #N_green_duration = N_single_car_time * N_vehicle_count
+            green_duration.append(E_single_car_time * E_vehicle_count)
+        ##### End Get Current Demand #####
+
+        ##### Get Future Demand #####
+        st_model_input =  self._st_meomry.get_samples()
+        st_model_output =  self._st_model.predict_one(st_model_input[:,:,1:])
+        future_traffic = pd.DataFrame(st_model_output[0,:,:], columns=[ 'east_speed','east_count',
+                                                                        'west_speed','west_count',
+                                                                        'north_speed','north_count',
+                                                                        'south_speed','south_count'])
+
+        if action == 0:
+            intersection_length = traci.lane.getLength('TL_1_0')
+            N_single_car_time = intersection_length/future_traffic.iloc[0]['north_speed']
+            green_duration.append(N_single_car_time* future_traffic.iloc[0]['north_count'] * 3/4)
+
+            S_single_car_time = intersection_length/future_traffic.iloc[0]['south_speed']
+            green_duration.append(S_single_car_time* future_traffic.iloc[0]['south_count'] * 3/4)
+
+        elif action == 1:
+            intersection_length = traci.lane.getLength('TL_10_0')
+            N_single_car_time = intersection_length/future_traffic.iloc[0]['north_speed']
+            green_duration.append(N_single_car_time* future_traffic.iloc[0]['north_count'] * 1/4)
+
+            S_single_car_time = intersection_length/future_traffic.iloc[0]['south_speed']
+            green_duration.append(S_single_car_time* future_traffic.iloc[0]['south_count'] * 1/4)
+
+        elif action == 2:
+            intersection_length = traci.lane.getLength('TL_1_0')
+            W_single_car_time = intersection_length/future_traffic.iloc[0]['west_speed']
+            green_duration.append(N_single_car_time* future_traffic.iloc[0]['west_count'] * 3/4)
+
+            E_single_car_time = intersection_length/future_traffic.iloc[0]['east_speed']
+            green_duration.append(S_single_car_time* future_traffic.iloc[0]['east_count'] * 3/4)
+
+        elif action == 3:
+            intersection_length = traci.lane.getLength('TL_10_0')
+            W_single_car_time = intersection_length/future_traffic.iloc[0]['west_speed']
+            green_duration.append(N_single_car_time* future_traffic.iloc[0]['west_count'] * 1/4)
+
+            E_single_car_time = intersection_length/future_traffic.iloc[0]['east_speed']
+            green_duration.append(S_single_car_time* future_traffic.iloc[0]['east_count'] * 1/4)
+        
+        return min(green_duration)
 
     def _set_yellow_phase(self, old_action):
         """
