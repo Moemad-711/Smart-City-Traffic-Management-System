@@ -40,26 +40,24 @@ class ST_Memory:
     def __init__(self, size, shape):
         self._samples = np.empty(shape=shape)
         self._size = size
+        self._size_now = 0
 
 
     def add_sample(self, sample):
         """
         Add a sample into the memory
         """
-        size_now = len(self._samples)
-        np.append(arr=self._samples[size_now:size_now,:,:], values=sample, axis=0)
-        if self._size_now() > self._size:
-            self._samples.pop(0)  # if the length is greater than the size of memory, remove the oldest element
+        if self._size_now >= self._size:
+            self._samples[:-1] = self._samples[1:]; self._samples[-1] = sample  # if the length is greater than the size of memory, remove the oldest element
+            return
+        
+        np.append(arr=self._samples[self._size_now,:,:], values=sample, axis=0)
+        self._size_now += 1
+        
 
     #Implement Method to return last N(time_steps) smaples 
     def get_samples(self):
-        if self._size_now() < self._size:
-            return None
+        if self._size_now < self._size:
+            return np.array([])
         else:
             return self._samples
-
-    def _size_now(self):
-        """
-        Check how full the memory is
-        """
-        return len(self._samples)

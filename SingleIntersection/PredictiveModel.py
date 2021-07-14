@@ -7,7 +7,7 @@ import sys
 import tensorflow as tf
 import numpy as np
 import pandas as pd
-from spektral.layers.convolutional import ChebConv
+from spektral.layers.convolutional import ChebConv, cheb_conv
 from tensorflow import keras
 from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import Dense
@@ -157,16 +157,21 @@ class TestPredictiveModel:
         model_file_path = os.path.join(model_folder_path, 'trained_predictive_model.h5')
         
         if os.path.isfile(model_file_path):
-            loaded_model = load_model(model_file_path)
+            loaded_model = load_model(model_file_path, custom_objects={'ChebConv':ChebConv})
             return loaded_model
         else:
             sys.exit("Model number not found")
     
     def predict_one(self,input_x): 
+        
+        input_x = np.expand_dims(input_x, axis=0)
+        #print('input_x: ', input_x.shape)
+        #print('input_x: ', input_x)
+        a_repeated = np.tile(self.adjacency_matrix, (input_x.shape[0],1,1))
+        #print('a_repeated: ', a_repeated.shape)
+        #print('a_repeated: ', a_repeated)
 
-        a_repeated = np.tile(self.adjacency_matrix, (input_x.shape[0],len(self.adjacency_matrix),len(self.adjacency_matrix[0])))
-
-        return self.model.predict(input_x,a_repeated)
+        return self.model.predict([input_x,a_repeated])
 
 
     
