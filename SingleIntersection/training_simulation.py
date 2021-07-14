@@ -207,7 +207,7 @@ class Simulation:
         if action == 0:
             intersection_length = traci.lane.getLength('TL_1_0')
             ### N2TL Duration ###
-            N_avg_speed = Sum([traci.lane.getLastStepMeanSpeed(lane) for lane in N_Straight])/3
+            N_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in N_Straight])/3
             N_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in N_Straight])
             N_single_car_time = intersection_length/N_avg_speed
             #N_green_duration = N_single_car_time * N_vehicle_count
