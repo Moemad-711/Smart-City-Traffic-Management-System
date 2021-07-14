@@ -17,7 +17,6 @@ from utils import import_train_configuration, set_sumo, set_train_path
 if __name__ == "__main__":
 
     config = import_train_configuration(config_file='training_settings.ini')
-    st_config = import_train_configuration(config_file='st_model_training_settings.ini')
     adjacency_matrix = [[0, 750, 750, 750, 750],
                         [750, 0, 0, 0, 0],
                         [750, 0, 0, 0, 0],
@@ -36,8 +35,8 @@ if __name__ == "__main__":
     )
     #Create an ST_Model(GNN) Object 
     st_model=TestPredictiveModel(
-         adjacency_matrix, 
-        'st_models\model_25')
+        adjacency_matrix, 
+        os.path.join('st_models', 'model_25'))
         
     Memory = Memory(
         config['memory_size_max'], 
