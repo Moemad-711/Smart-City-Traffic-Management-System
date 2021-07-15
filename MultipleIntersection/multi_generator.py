@@ -107,7 +107,7 @@ class TrafficGenerator:
                 straight_or_turn = np.random.uniform()
                 if straight_or_turn < 0.75:  # choose direction: straight or turn - 75% of times the car goes straight
                     route_straight = np.random.randint(1, 41)  # choose a random source & destination
-                     if route_straight == 1:
+                    if route_straight == 1:
                         print('    <vehicle id="UW_RN_%i" type="standard_car" route="UW_RN" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_straight == 2:
                         print('    <vehicle id="UW_UE_%i" type="standard_car" route="UW_UE" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
@@ -188,72 +188,72 @@ class TrafficGenerator:
                     else: 
                         print('    <vehicle id="LN_UW_%i" type="standard_car" route="LN_UW" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
        
-          else:  # car that turn -25% of the time the car turns
+                else:  # car that turn -25% of the time the car turns
                     route_turn = np.random.randint(1, 33)  # choose random source source & destination
                     if route_turn == 1:
-                   print('    <vehicle id="UW_LE0_%i" type="standard_car" route="UW_LE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UW_LE0_%i" type="standard_car" route="UW_LE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 2:
-                   print('    <vehicle id="UW_LE1_%i" type="standard_car" route="UW_LE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UW_LE1_%i" type="standard_car" route="UW_LE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 3:
-                   print('    <vehicle id="UW_RS0_%i" type="standard_car" route="UW_RS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UW_RS0_%i" type="standard_car" route="UW_RS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 4:
-                   print('    <vehicle id="UW_RS1_%i" type="standard_car" route="UW_RS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UW_RS1_%i" type="standard_car" route="UW_RS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 5:
-                   print('    <vehicle id="LW_UE0_%i" type="standard_car" route="LW_UE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LW_UE0_%i" type="standard_car" route="LW_UE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 6:
-                   print('    <vehicle id="LW_UE1_%i" type="standard_car" route="LW_UE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LW_UE1_%i" type="standard_car" route="LW_UE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 7:
-                   print('    <vehicle id="LW_LN0_%i" type="standard_car" route="LW_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LW_LN0_%i" type="standard_car" route="LW_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 8:
-                   print('    <vehicle id="LW_LN1_%i" type="standard_car" route="LW_LN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LW_LN1_%i" type="standard_car" route="LW_LN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 9:
-                   print('    <vehicle id="LS_UE0_%i" type="standard_car" route="LS_UE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LS_UE0_%i" type="standard_car" route="LS_UE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 10:
-                   print('    <vehicle id="LS_UE1_%i" type="standard_car" route="LS_UE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LS_UE1_%i" type="standard_car" route="LS_UE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 11:
-                   print('    <vehicle id="LS_RN0_%i" type="standard_car" route="LS_RN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LS_RN0_%i" type="standard_car" route="LS_RN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 12:
-                   print('    <vehicle id="LS_RN1_%i" type="standard_car" route="LS_RN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LS_RN1_%i" type="standard_car" route="LS_RN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 13:
-                   print('    <vehicle id="RS_LN0_%i" type="standard_car" route="RS_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RS_LN0_%i" type="standard_car" route="RS_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 14:
-                   print('    <vehicle id="RS_LN1_%i" type="standard_car" route="RS_LN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RS_LN1_%i" type="standard_car" route="RS_LN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 15:
-                   print('    <vehicle id="RS_UW0_%i" type="standard_car" route="RS_UW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RS_UW0_%i" type="standard_car" route="RS_UW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 16:
-                   print('    <vehicle id="RS_UW1_%i" type="standard_car" route="RS_UW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RS_UW1_%i" type="standard_car" route="RS_UW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 17:
-                   print('    <vehicle id="LE_LN0_%i" type="standard_car" route="LE_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LE_LN0_%i" type="standard_car" route="LE_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 18:
-                   print('    <vehicle id="LE_LN1_%i" type="standard_car" route="LE_LN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LE_LN1_%i" type="standard_car" route="LE_LN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 19:
-                   print('    <vehicle id="LE_UW0_%i" type="standard_car" route="LE_UW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LE_UW0_%i" type="standard_car" route="LE_UW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 20:
-                   print('    <vehicle id="LE_UW1_%i" type="standard_car" route="LE_UW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LE_UW1_%i" type="standard_car" route="LE_UW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 21:
-                   print('    <vehicle id="UE_LW0_%i" type="standard_car" route="UE_LW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UE_LW0_%i" type="standard_car" route="UE_LW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 22:
-                   print('    <vehicle id="UE_LW1_%i" type="standard_car" route="UE_LW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UE_LW1_%i" type="standard_car" route="UE_LW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 23:
-                   print('    <vehicle id="UE_LS0_%i" type="standard_car" route="UE_LS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UE_LS0_%i" type="standard_car" route="UE_LS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 24:
-                   print('    <vehicle id="UE_LS1_%i" type="standard_car" route="UE_LS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UE_LS1_%i" type="standard_car" route="UE_LS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 25:
-                   print('    <vehicle id="RN_LW0_%i" type="standard_car" route="RN_LW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RN_LW0_%i" type="standard_car" route="RN_LW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 26:
-                   print('    <vehicle id="RN_LW1_%i" type="standard_car" route="RN_LW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RN_LW1_%i" type="standard_car" route="RN_LW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 27:
-                   print('    <vehicle id="RN_LS0_%i" type="standard_car" route="RN_LS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RN_LS0_%i" type="standard_car" route="RN_LS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 28:
-                   print('    <vehicle id="RN_LS1_%i" type="standard_car" route="RN_LS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RN_LS1_%i" type="standard_car" route="RN_LS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 29:
-                   print('    <vehicle id="LN_RS0_%i" type="standard_car" route="LN_RS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LN_RS0_%i" type="standard_car" route="LN_RS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 30:
-                   print('    <vehicle id="LN_RS1_%i" type="standard_car" route="LN_RS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LN_RS1_%i" type="standard_car" route="LN_RS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 31:
-                   print('    <vehicle id="LN_LE0_%i" type="standard_car" route="LN_LE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LN_LE0_%i" type="standard_car" route="LN_LE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 32:
-                   print('    <vehicle id="LN_LE1_%i" type="standard_car" route="" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LN_LE1_%i" type="standard_car" route="" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                                                                
             print("</routes>", file=routes)
 
@@ -447,69 +447,69 @@ class TrafficGenerator:
                 else:  # car that turn -25% of the time the car turns
                     route_turn = np.random.randint(1, 33)  # choose random source source & destination      
                     if route_turn == 1:
-                   print('    <vehicle id="UW_LE0_%i" type="standard_car" route="UW_LE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UW_LE0_%i" type="standard_car" route="UW_LE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 2:
-                   print('    <vehicle id="UW_LE1_%i" type="standard_car" route="UW_LE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UW_LE1_%i" type="standard_car" route="UW_LE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 3:
-                   print('    <vehicle id="UW_RS0_%i" type="standard_car" route="UW_RS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UW_RS0_%i" type="standard_car" route="UW_RS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 4:
-                   print('    <vehicle id="UW_RS1_%i" type="standard_car" route="UW_RS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UW_RS1_%i" type="standard_car" route="UW_RS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 5:
-                   print('    <vehicle id="LW_UE0_%i" type="standard_car" route="LW_UE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LW_UE0_%i" type="standard_car" route="LW_UE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 6:
-                   print('    <vehicle id="LW_UE1_%i" type="standard_car" route="LW_UE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LW_UE1_%i" type="standard_car" route="LW_UE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 7:
-                   print('    <vehicle id="LW_LN0_%i" type="standard_car" route="LW_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LW_LN0_%i" type="standard_car" route="LW_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 8:
-                   print('    <vehicle id="LW_LN1_%i" type="standard_car" route="LW_LN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LW_LN1_%i" type="standard_car" route="LW_LN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 9:
-                   print('    <vehicle id="LS_UE0_%i" type="standard_car" route="LS_UE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LS_UE0_%i" type="standard_car" route="LS_UE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 10:
-                   print('    <vehicle id="LS_UE1_%i" type="standard_car" route="LS_UE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LS_UE1_%i" type="standard_car" route="LS_UE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 11:
-                   print('    <vehicle id="LS_RN0_%i" type="standard_car" route="LS_RN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LS_RN0_%i" type="standard_car" route="LS_RN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 12:
-                   print('    <vehicle id="LS_RN1_%i" type="standard_car" route="LS_RN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LS_RN1_%i" type="standard_car" route="LS_RN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 13:
-                   print('    <vehicle id="RS_LN0_%i" type="standard_car" route="RS_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RS_LN0_%i" type="standard_car" route="RS_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 14:
-                   print('    <vehicle id="RS_LN1_%i" type="standard_car" route="RS_LN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RS_LN1_%i" type="standard_car" route="RS_LN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 15:
-                   print('    <vehicle id="RS_UW0_%i" type="standard_car" route="RS_UW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RS_UW0_%i" type="standard_car" route="RS_UW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 16:
-                   print('    <vehicle id="RS_UW1_%i" type="standard_car" route="RS_UW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RS_UW1_%i" type="standard_car" route="RS_UW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 17:
-                   print('    <vehicle id="LE_LN0_%i" type="standard_car" route="LE_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LE_LN0_%i" type="standard_car" route="LE_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 18:
-                   print('    <vehicle id="LE_LN1_%i" type="standard_car" route="LE_LN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LE_LN1_%i" type="standard_car" route="LE_LN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 19:
-                   print('    <vehicle id="LE_UW0_%i" type="standard_car" route="LE_UW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LE_UW0_%i" type="standard_car" route="LE_UW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 20:
-                   print('    <vehicle id="LE_UW1_%i" type="standard_car" route="LE_UW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LE_UW1_%i" type="standard_car" route="LE_UW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 21:
-                   print('    <vehicle id="UE_LW0_%i" type="standard_car" route="UE_LW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UE_LW0_%i" type="standard_car" route="UE_LW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 22:
-                   print('    <vehicle id="UE_LW1_%i" type="standard_car" route="UE_LW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UE_LW1_%i" type="standard_car" route="UE_LW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 23:
-                   print('    <vehicle id="UE_LS0_%i" type="standard_car" route="UE_LS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UE_LS0_%i" type="standard_car" route="UE_LS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 24:
-                   print('    <vehicle id="UE_LS1_%i" type="standard_car" route="UE_LS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="UE_LS1_%i" type="standard_car" route="UE_LS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 25:
-                   print('    <vehicle id="RN_LW0_%i" type="standard_car" route="RN_LW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RN_LW0_%i" type="standard_car" route="RN_LW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 26:
-                   print('    <vehicle id="RN_LW1_%i" type="standard_car" route="RN_LW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RN_LW1_%i" type="standard_car" route="RN_LW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 27:
-                   print('    <vehicle id="RN_LS0_%i" type="standard_car" route="RN_LS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RN_LS0_%i" type="standard_car" route="RN_LS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 28:
-                   print('    <vehicle id="RN_LS1_%i" type="standard_car" route="RN_LS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="RN_LS1_%i" type="standard_car" route="RN_LS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 29:
-                   print('    <vehicle id="LN_RS0_%i" type="standard_car" route="LN_RS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LN_RS0_%i" type="standard_car" route="LN_RS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 30:
-                   print('    <vehicle id="LN_RS1_%i" type="standard_car" route="LN_RS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LN_RS1_%i" type="standard_car" route="LN_RS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 31:
-                   print('    <vehicle id="LN_LE0_%i" type="standard_car" route="LN_LE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LN_LE0_%i" type="standard_car" route="LN_LE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif route_turn == 32:
-                   print('    <vehicle id="LN_LE1_%i" type="standard_car" route="" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
+                        print('    <vehicle id="LN_LE1_%i" type="standard_car" route="" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                                                                
             print("</routes>", file=routes)
         
