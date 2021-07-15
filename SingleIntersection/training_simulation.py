@@ -98,7 +98,7 @@ class Simulation:
             # TODO: Call Method to Evaluate Greenlight Time
             greenlight_duration = self.get_green_duration(action=action)
             if len(greenlight_duration) > 0:
-                self._green_duration = min(greenlight_duration)
+                self._green_duration = math.ceil(min(greenlight_duration))
             #print('green_duration',self._green_duration)
             self._simulate(self._green_duration)
 
@@ -135,6 +135,7 @@ class Simulation:
             steps_todo = self._max_steps - self._step
 
         while steps_todo > 0:
+            print(' - Step:', self._step)
             traci.simulationStep()  # simulate 1 step in sumo
 
             # saving traffic features to st_memory                
@@ -280,13 +281,13 @@ class Simulation:
         
         if len(st_model_input) == 0 :
             return green_duration
-
+        print('     predicting traffic...')
         st_model_output =  self._st_model.predict_one(st_model_input[:,:,:])
         future_traffic = pd.DataFrame(st_model_output[0,0,:,:], columns=[ 'east_speed','east_count',
                                                                         'west_speed','west_count',
                                                                         'north_speed','north_count',
                                                                         'south_speed','south_count'])
-
+        print('     future_traffic:', future_traffic)
         if action == 0:
             intersection_length = 33.60
             #N_single_car_time = intersection_length/future_traffic.iloc[0]['north_speed']
@@ -350,7 +351,7 @@ class Simulation:
                                             - (4*.5*-intersection_length)))
             if future_traffic.iloc[0]['east_count']  != 0:     
                 green_duration.append(E_single_car_time* future_traffic.iloc[0]['east_count'] * 1/4)
-            
+        print('     green_duration:', green_duration)
         return green_duration
 
     def _set_yellow_phase(self, old_action):
