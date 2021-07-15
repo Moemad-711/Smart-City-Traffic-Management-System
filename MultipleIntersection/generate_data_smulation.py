@@ -35,9 +35,11 @@ class Simulation:
                 print('<timestep time="%d">' % (self._step),file=data)
                 edge_list = traci.edge.getIDList()
                 for edge in edge_list:
-                    avg_speed = traci.edge.getLastStepMeanSpeed(edge)
-                    vehicle_count = traci.edge.getLastStepVehicleNumber(edge)
-                    node = edge
+                    node = str(edge).split()[1]
+                    if node in TL_Nodes:
+                        avg_speed = traci.edge.getLastStepMeanSpeed(edge)
+                        vehicle_count = traci.edge.getLastStepVehicleNumber(edge)
+                        print('',file=data)
                 print('</timestep>',file=data)
                 self._step += 1
             print('</fcd-export>',file=data)   
