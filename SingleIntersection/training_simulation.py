@@ -99,12 +99,13 @@ class Simulation:
             
             # TODO: Call Method to Evaluate Greenlight Time
             greenlight_durations = self.get_green_duration(action=action)
-            if len(greenlight_duration) > 0:
-                greenlight_duration = math.ceil(min([x for x in greenlight_durations and x > 0]))
+            greenlight_durations =[x for x in greenlight_durations if x>0 and x<= 30]
+            print(' greenlight_durations: ', greenlight_durations)
+            if len(greenlight_durations) > 0:
+                greenlight_duration = math.ceil(min(greenlight_durations))
                 print(' green_duration: ',greenlight_duration )
                 self._simulate(greenlight_duration)
             else:
-                print(' green_duration: ',self._green_duration )
                 self._simulate(self._green_duration)
             
             #self._simulate(self._green_duration)
@@ -228,7 +229,7 @@ class Simulation:
             S_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in S_Straight])/3
             S_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in S_Straight])
             if S_vehicle_count != 0:
-                S_single_car_time = -S_avg_speed+ math.sqrt((S_avg_speed*S_avg_speed) - (4*.5*-intersection_length))
+                S_single_car_time = -S_avg_speed + math.sqrt((S_avg_speed*S_avg_speed) - (4*.5*-intersection_length))
                 green_duration.append(S_single_car_time * S_vehicle_count)
 
         elif action == 1:
