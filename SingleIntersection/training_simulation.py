@@ -99,8 +99,8 @@ class Simulation:
             
             # TODO: Call Method to Evaluate Greenlight Time
             greenlight_durations = self.get_green_duration(action=action)
-            greenlight_duration = math.ceil(min([x for x in greenlight_durations and x > 0]))
             if len(greenlight_duration) > 0:
+                greenlight_duration = math.ceil(min([x for x in greenlight_durations and x > 0]))
                 print(' green_duration: ',greenlight_duration )
                 self._simulate(greenlight_duration)
             else:
