@@ -40,6 +40,7 @@ class Simulation:
                         avg_speed = traci.edge.getLastStepMeanSpeed(edge)
                         vehicle_count = traci.edge.getLastStepVehicleNumber(edge)
                         print('',file=data)
+                        ## Data ---> Dataframe? ----> numpy array(batch_size(time_steps),4,8) 
                 print('</timestep>',file=data)
                 self._step += 1
             print('</fcd-export>',file=data)   
