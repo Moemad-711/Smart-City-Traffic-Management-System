@@ -1,3 +1,4 @@
+from numpy.core.numeric import NaN
 from numpy.lib.arraysetops import intersect1d
 from numpy.lib.function_base import average
 import pandas as pd
@@ -294,14 +295,14 @@ class Simulation:
             N_single_car_time = (-future_traffic.iloc[0]['north_speed'] 
                                 + math.sqrt((future_traffic.iloc[0]['north_speed']*future_traffic.iloc[0]['north_speed']) 
                                             - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['north_count']  != 0: 
+            if future_traffic.iloc[0]['north_count']  != 0 and not  math.isnan(future_traffic.iloc[0]['north_count']): 
                 green_duration.append(N_single_car_time* math.ceil(future_traffic.iloc[0]['north_count']) * 3/4)
 
             #S_single_car_time = intersection_length/future_traffic.iloc[0]['south_speed']
             S_single_car_time = (-future_traffic.iloc[0]['south_speed'] 
                                 + math.sqrt((future_traffic.iloc[0]['south_speed']*future_traffic.iloc[0]['south_speed']) 
                                             - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['south_count']  != 0:
+            if future_traffic.iloc[0]['south_count']  != 0 and not  math.isnan(future_traffic.iloc[0]['south_count']):
                 green_duration.append(S_single_car_time* math.ceil(future_traffic.iloc[0]['south_count']) * 3/4)
 
         elif action == 1:
@@ -310,14 +311,14 @@ class Simulation:
             N_single_car_time = (-future_traffic.iloc[0]['north_speed'] 
                                 + math.sqrt((future_traffic.iloc[0]['north_speed']*future_traffic.iloc[0]['north_speed']) 
                                             - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['north_count']  != 0: 
+            if future_traffic.iloc[0]['north_count']  != 0 and not  math.isnan(future_traffic.iloc[0]['north_count']): 
                 green_duration.append(N_single_car_time* math.ceil(future_traffic.iloc[0]['north_count']) * 1/4)
 
             #S_single_car_time = intersection_length/future_traffic.iloc[0]['south_speed']
             S_single_car_time = (-future_traffic.iloc[0]['south_speed'] 
                                 + math.sqrt((future_traffic.iloc[0]['south_speed']*future_traffic.iloc[0]['south_speed']) 
                                             - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['south_count']  != 0:
+            if future_traffic.iloc[0]['south_count']  != 0 and not math.isnan(future_traffic.iloc[0]['south_count']):
                 green_duration.append(S_single_car_time* math.ceil(future_traffic.iloc[0]['south_count']) * 1/4)
 
         elif action == 2:
@@ -326,15 +327,15 @@ class Simulation:
             W_single_car_time = (-future_traffic.iloc[0]['west_speed'] 
                                 + math.sqrt((future_traffic.iloc[0]['west_speed']*future_traffic.iloc[0]['west_speed']) 
                                             - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['west_count']  != 0:
-                green_duration.append(W_single_car_time* future_traffic.iloc[0]['west_count'] * 3/4)
+            if future_traffic.iloc[0]['west_count']  != 0 and not math.isnan(future_traffic.iloc[0]['west_count']):
+                green_duration.append(W_single_car_time* math.ceil(future_traffic.iloc[0]['west_count']) * 3/4)
 
             #E_single_car_time = intersection_length/future_traffic.iloc[0]['east_speed']
             E_single_car_time = (-future_traffic.iloc[0]['east_speed'] 
                                 + math.sqrt((future_traffic.iloc[0]['east_speed']*future_traffic.iloc[0]['east_speed']) 
                                             - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['east_count']  != 0:    
-                green_duration.append(E_single_car_time* future_traffic.iloc[0]['east_count'] * 3/4)
+            if future_traffic.iloc[0]['east_count']  != 0 and not math.isnan(future_traffic.iloc[0]['east_count']):    
+                green_duration.append(E_single_car_time* math.ceil(future_traffic.iloc[0]['east_count']) * 3/4)
 
         elif action == 3:
             intersection_length = 29.67
@@ -342,15 +343,15 @@ class Simulation:
             W_single_car_time = (-future_traffic.iloc[0]['west_speed'] 
                                 + math.sqrt((future_traffic.iloc[0]['west_speed']*future_traffic.iloc[0]['west_speed']) 
                                             - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['west_count']  != 0:    
-                green_duration.append(W_single_car_time* future_traffic.iloc[0]['west_count'] * 1/4)
+            if future_traffic.iloc[0]['west_count']  != 0 and not math.isnan(future_traffic.iloc[0]['west_count']):    
+                green_duration.append(W_single_car_time* math.ceil(future_traffic.iloc[0]['west_count']) * 1/4)
 
             #E_single_car_time = intersection_length/future_traffic.iloc[0]['east_speed']
             E_single_car_time = (-future_traffic.iloc[0]['east_speed'] 
                                 + math.sqrt((future_traffic.iloc[0]['east_speed']*future_traffic.iloc[0]['east_speed']) 
                                             - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['east_count']  != 0:     
-                green_duration.append(E_single_car_time* future_traffic.iloc[0]['east_count'] * 1/4)
+            if future_traffic.iloc[0]['east_count']  != 0 and not math.isnan(future_traffic.iloc[0]['east_count']):     
+                green_duration.append(E_single_car_time* math.ceil(future_traffic.iloc[0]['east_count']) * 1/4)
         print('     green_duration:', green_duration)
         return green_duration
 
