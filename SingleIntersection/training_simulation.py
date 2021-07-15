@@ -98,17 +98,17 @@ class Simulation:
             self._set_green_phase(action)
             
             # TODO: Call Method to Evaluate Greenlight Time
-            greenlight_durations = self.get_green_duration(action=action)
-            greenlight_durations =[x for x in greenlight_durations if x>0 and x<= 30]
-            print(' greenlight_durations: ', greenlight_durations)
-            if len(greenlight_durations) > 0:
-                greenlight_duration = math.ceil(min(greenlight_durations))
-                print(' green_duration: ',greenlight_duration )
-                self._simulate(greenlight_duration)
-            else:
-                self._simulate(self._green_duration)
+            #greenlight_durations = self.get_green_duration(action=action)
+            #greenlight_durations =[x for x in greenlight_durations if x>0 and x<= 30]
+            #print(' greenlight_durations: ', greenlight_durations)
+            #if len(greenlight_durations) > 0:
+            #    greenlight_duration = math.ceil(min(greenlight_durations))
+            #    #print(' green_duration: ',greenlight_duration )
+            #    self._simulate(greenlight_duration)
+            #else:
+            #    self._simulate(self._green_duration)
             
-            #self._simulate(self._green_duration)
+            self._simulate(self._green_duration)
 
             # saving variables for later & accumulate reward
             old_state = current_state
