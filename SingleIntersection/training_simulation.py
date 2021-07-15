@@ -287,7 +287,7 @@ class Simulation:
                                                                         'west_speed','west_count',
                                                                         'north_speed','north_count',
                                                                         'south_speed','south_count'])
-        print('     future_traffic:', future_traffic)
+        print('     future_traffic:\n', future_traffic)
         if action == 0:
             intersection_length = 33.60
             #N_single_car_time = intersection_length/future_traffic.iloc[0]['north_speed']
@@ -295,14 +295,14 @@ class Simulation:
                                 + math.sqrt((future_traffic.iloc[0]['north_speed']*future_traffic.iloc[0]['north_speed']) 
                                             - (4*.5*-intersection_length)))
             if future_traffic.iloc[0]['north_count']  != 0: 
-                green_duration.append(N_single_car_time* future_traffic.iloc[0]['north_count'] * 3/4)
+                green_duration.append(N_single_car_time* math.ceil(future_traffic.iloc[0]['north_count']) * 3/4)
 
             #S_single_car_time = intersection_length/future_traffic.iloc[0]['south_speed']
             S_single_car_time = (-future_traffic.iloc[0]['south_speed'] 
                                 + math.sqrt((future_traffic.iloc[0]['south_speed']*future_traffic.iloc[0]['south_speed']) 
                                             - (4*.5*-intersection_length)))
             if future_traffic.iloc[0]['south_count']  != 0:
-                green_duration.append(S_single_car_time* future_traffic.iloc[0]['south_count'] * 3/4)
+                green_duration.append(S_single_car_time* math.ceil(future_traffic.iloc[0]['south_count']) * 3/4)
 
         elif action == 1:
             intersection_length = 29.67
@@ -311,14 +311,14 @@ class Simulation:
                                 + math.sqrt((future_traffic.iloc[0]['north_speed']*future_traffic.iloc[0]['north_speed']) 
                                             - (4*.5*-intersection_length)))
             if future_traffic.iloc[0]['north_count']  != 0: 
-                green_duration.append(N_single_car_time* future_traffic.iloc[0]['north_count'] * 1/4)
+                green_duration.append(N_single_car_time* math.ceil(future_traffic.iloc[0]['north_count']) * 1/4)
 
             #S_single_car_time = intersection_length/future_traffic.iloc[0]['south_speed']
             S_single_car_time = (-future_traffic.iloc[0]['south_speed'] 
                                 + math.sqrt((future_traffic.iloc[0]['south_speed']*future_traffic.iloc[0]['south_speed']) 
                                             - (4*.5*-intersection_length)))
             if future_traffic.iloc[0]['south_count']  != 0:
-                green_duration.append(S_single_car_time* future_traffic.iloc[0]['south_count'] * 1/4)
+                green_duration.append(S_single_car_time* math.ceil(future_traffic.iloc[0]['south_count']) * 1/4)
 
         elif action == 2:
             intersection_length = 33.60
