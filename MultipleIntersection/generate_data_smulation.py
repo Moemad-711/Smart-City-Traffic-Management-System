@@ -1,9 +1,12 @@
+from libsumo.libsumo import edge, vehicle
 import traci
 import numpy as np
 import random
 import timeit
 import os
     
+TL_Nodes = ['tl1','tl2','tl3','tl4']
+
 class Simulation:
     def __init__(self,TrafficGen, sumo_cmd, max_steps):
         self._TrafficGen = TrafficGen
@@ -30,17 +33,11 @@ class Simulation:
                 #print('  Step-%i' % (self._step))
                 traci.simulationStep()
                 print('<timestep time="%d">' % (self._step),file=data)
-                car_list = traci.vehicle.getIDList()
-                for car_id in car_list:
-                    #print(car_id)
-                    x,y = traci.vehicle.getPosition(car_id)
-                    angle=traci.vehicle.getAngle(car_id)                  
-                    vehicle_type=traci.vehicle.getTypeID(car_id)                  
-                    speed=traci.vehicle.getSpeed(car_id)
-                    lane_pos=traci.vehicle.getLanePosition(car_id)                   
-                    edge=traci.vehicle.getRoadID(car_id)
-                    lane_id=traci.vehicle.getLaneID(car_id)
-                    print('    <vehicle id="%s" x="%d" y="%d" angle="%d" type="%s" speed="%d" pos="%d" edge="%s" lane="%s" />' % (car_id, x, y, angle, vehicle_type, speed, lane_pos, edge, lane_id), file=data)
+                edge_list = traci.edge.getIDList()
+                for edge in edge_list:
+                    avg_speed = traci.edge.getLastStepMeanSpeed(edge)
+                    vehicle_count = traci.edge.getLastStepVehicleNumber(edge)
+                    node = edge
                 print('</timestep>',file=data)
                 self._step += 1
             print('</fcd-export>',file=data)   
