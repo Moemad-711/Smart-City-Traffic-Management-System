@@ -42,7 +42,7 @@ if __name__ == "__main__":
     while episode < config['total_episodes']:
         print('\n----- Episode', str(episode+1), 'of', str(config['total_episodes']))
         simulation_time= Simulation.run(episode)  # run the simulation
-        print('Simulation time:', simulation_time, 's - Training time:', training_time, 's - Total:', round(simulation_time+training_time, 1), 's')
+        print('Simulation time:', simulation_time)
         episode += 1
 
     print("\n----- Start time:", timestamp_start)
