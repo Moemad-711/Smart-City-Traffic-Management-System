@@ -30,18 +30,17 @@ W_left = ['W2TL_3']
 E_Straight = ['E2TL_0', 'E2TL_1', 'E2TL_2']
 E_left = ['E2TL_3']
 class Simulation:
-    def __init__(self,TrafficGen, sumo_cmd,max_steps, green_duration, yellow_duration, num_actions, training_epochs):
+    def __init__(self,TrafficGen, sumo_cmd,max_steps, green_duration, yellow_duration):
         self._TrafficGen = TrafficGen
         self._step = 0
+        self._action = 0
         self._sumo_cmd = sumo_cmd
         self._max_steps = max_steps
         self._green_duration = green_duration
         self._yellow_duration = yellow_duration
-        self._num_actions = num_actions
         self._reward_store = []
         self._cumulative_wait_store = []
         self._avg_queue_length_store = []
-        self._training_epochs = training_epochs
 
 
     def run(self, episode):
@@ -99,33 +98,6 @@ class Simulation:
         while steps_todo > 0:
             #print(' - Step:', self._step)
             traci.simulationStep()  # simulate 1 step in sumo
-
-            # saving traffic features to st_memory                
-            north_speed = traci.edge.getLastStepMeanSpeed('N2TL')
-            north_count = traci.edge.getLastStepVehicleNumber('N2TL')
-
-            south_speed = traci.edge.getLastStepMeanSpeed('S2TL')
-            south_count = traci.edge.getLastStepVehicleNumber('S2TL')
-
-            west_speed = traci.edge.getLastStepMeanSpeed('W2TL')
-            west_count = traci.edge.getLastStepVehicleNumber('W2TL')
-
-            east_speed = traci.edge.getLastStepMeanSpeed('E2TL')
-            east_count = traci.edge.getLastStepVehicleNumber('E2TL')
-            
-            sample_dict = pd.DataFrame(columns=['east_speed','east_count',
-                                                'west_speed','west_count',
-                                                'north_speed','north_count',
-                                                'south_speed','south_count'])
-            sample_dict = sample_dict.append({'east_speed': west_speed,'east_count': east_count,
-                                              'west_speed': east_speed,'west_count': west_count,
-                                              'north_speed': north_speed,'north_count': north_count,
-                                              'south_speed': south_speed,'south_count': south_count},
-                                              ignore_index=True)                                                
-            
-            sample = sample_dict.to_numpy()
-            self._st_meomry.add_sample(sample)
-
             self._step += 1 # update the step counter
             steps_todo -= 1
             queue_length = self._get_queue_length()
@@ -152,8 +124,8 @@ class Simulation:
 
 
     def _choose_action(self):
-        self.action=(self.action+1)%4
-        return self.action
+        self._action=(self._action+1)%4
+        return self._action
 
    
     def _set_yellow_phase(self, old_action):

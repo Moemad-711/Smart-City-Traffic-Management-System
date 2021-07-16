@@ -10,19 +10,22 @@ import os
 import sys
 import xml.etree.ElementTree as et 
 
-def import_st_model_train_configuration(config_file):
+
+def import_static_configuration(config_file):
     """
     Read the config file regarding the training and import its content
     """
     content = configparser.ConfigParser()
     content.read(config_file)
     config = {}
-    config['prediction_steps'] = content['model'].getint('prediction_steps')
-    config['batch_size'] = content['model'].getint('batch_size')
-    config['train_split'] = content['model'].getfloat('train_split')
-    config['training_epochs'] = content['model'].getint('training_epochs')
-    config['traffic_feature_folder_num'] = content['dir'].getint('traffic_feature_folder_num')
-    config['models_path_name'] = content['dir']['models_path_name']
+    config['gui'] = content['simulation'].getboolean('gui')
+    config['total_episodes'] = content['simulation'].getint('total_episodes')
+    config['max_steps'] = content['simulation'].getint('max_steps')
+    config['n_cars_generated'] = content['simulation'].getint('n_cars_generated')
+    config['green_duration'] = content['simulation'].getint('green_duration')
+    config['yellow_duration'] = content['simulation'].getint('yellow_duration')
+    config['path_name'] = content['dir']['path_name']
+    config['sumocfg_file_name'] = content['dir']['sumocfg_file_name']
     return config
  
 def import_generate_data_configuration(config_file):
@@ -51,8 +54,7 @@ def import_train_configuration(config_file):
     config['gui'] = content['simulation'].getboolean('gui')
     config['total_episodes'] = content['simulation'].getint('total_episodes')
     config['max_steps'] = content['simulation'].getint('max_steps')
-    config['n_cars_generated'] = content['simulation'].getint(
-        'n_cars_generated')
+    config['n_cars_generated'] = content['simulation'].getint('n_cars_generated')
     config['green_duration'] = content['simulation'].getint('green_duration')
     config['yellow_duration'] = content['simulation'].getint('yellow_duration')
     config['num_layers'] = content['model'].getint('num_layers')
@@ -149,6 +151,24 @@ def set_traffic_features_path(traffic_features_path_name):
         new_version = '1'
 
     data_path = os.path.join(traffic_features_path, 'traffic_features_'+new_version, '')
+    os.makedirs(os.path.dirname(data_path), exist_ok=True)
+    return data_path
+
+def set_static_path(models_path_name):
+    """
+    Create a new model path with an incremental integer, also considering previously created model paths
+    """
+    models_path = os.path.join(os.getcwd(), models_path_name, '')
+    os.makedirs(os.path.dirname(models_path), exist_ok=True)
+
+    dir_content = os.listdir(models_path)
+    if dir_content:
+        previous_versions = [int(name.split("_")[1]) for name in dir_content]
+        new_version = str(max(previous_versions) + 1)
+    else:
+        new_version = '1'
+
+    data_path = os.path.join(models_path, 'static_'+new_version, '')
     os.makedirs(os.path.dirname(data_path), exist_ok=True)
     return data_path
 
