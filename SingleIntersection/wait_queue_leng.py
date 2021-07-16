@@ -15,7 +15,7 @@ class Simulation:
 
     def run(self, episode, epsilon):
         """
-        Runs an episode of simulation, then starts a training session
+        Runs an episode of simulation
         """
         start_time = timeit.default_timer()
 
