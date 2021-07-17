@@ -205,10 +205,10 @@ class Simulation:
         """
         Decide wheter to perform an explorative or exploitative action, according to an epsilon-greedy policy
         """
-        if random.random() < epsilon[TL]:
+        if random.random() < epsilon:
             return random.randint(0, self._num_actions - 1) # random action
         else:
-            return np.argmax(self._Models.predict_one(state)) # the best action given the current state
+            return np.argmax(self._Models[TL].predict_one(state)) # the best action given the current state
 
     #Write method to get the Greenlight Time
     def get_green_duration(self,action): 
