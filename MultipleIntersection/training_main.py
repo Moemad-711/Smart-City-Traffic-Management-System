@@ -24,7 +24,7 @@ if __name__ == "__main__":
                         [750, 0, 0, 0, 0],]
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
     path = set_train_path(config['models_path_name'])
-Model = TrainModel(
+    Model = TrainModel(
         config['num_layers'], 
         config['width_layers'], 
         config['batch_size'], 

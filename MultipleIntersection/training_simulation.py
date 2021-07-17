@@ -409,21 +409,30 @@ class Simulation:
         """
         Retrieve the state of the intersection from sumo, in the form of cell occupancy
         """
+        straights={'weast':['uw_tl1_0','uw_tl1_1','uw_tl1_2','tl1_tl2_0','tl1_tl2_1','tl1_tl2_2','lw_tl3_0','lw_tl3_1','lw_tl3_2','tl3_tl4_0','tl3_tl4_1','tl3_tl4_2'],
+                    'east':['tl2_tl1_0','tl2_tl1_1','tl2_tl1_2','ue-tl2_0','ue-tl2_1','ue-tl2_2','tl4_tl3_0','tl4_tl3_1','tl4_tl3_2','le_tl4_0','le_tl4_1','le_tl4_2'],
+                    'south':['tl3_tl1_0','tl3_tl1_1','tl3_tl1_2','tl4_tl2_0','tl4_tl2_1','tl4_tl2_2','ls_tl3_0','ls_tl3_1','ls_tl3_2','rs_tl4_0','rs_tl4_1','rs_tl4_2'],
+                    'north':['ln_tl1_0','ln_tl1_1','ln_tl1_2','rn_tl2_0','rn_tl2_1','rn_tl2_2','tl1_tl3_0','tl1_tl3_1','tl1_tl3_2','tl2_tl4_0','tl2_tl4_1','tl2_tl4_2']}
+        
+        turns={     'weast':['uw_tl1_3','tl1_tl2_3','lw_tl3_3','tl3_tl4_3'],
+                    'east':['tl2_tl1_3','ue-tl2_3','tl4_tl3_3','le_tl4_3'],
+                    'south':['tl3_tl1_3','tl4_tl2_3','ls_tl3_3','rs_tl4_3'],
+                    'north':['ln_tl1_3','rn_tl2_3','tl1_tl3_3','tl2_tl4_3']}
+        lane_groups=[straights['weast'],turns['weast'],straights['east'],turns['east'],
+                    straights['south'],turns['south'],straights['north'],turns['north']]
         state = np.zeros(self._num_states)
         car_list = traci.vehicle.getIDList()
-        incoming_roads ={'TL1':['uw_tl1 w','tl3_tl1 s','tl2_tl1 e','ln_tl1 n'],
-                         'TL2':['rn_tl2 n','tl1_tl2 w','tl4_tl2 s','ue-tl2 e'],
-                         'TL3':['tl4_tl3 e','tl1_tl3 n','lw_tl3 w','ls_tl3 s'],
-                         'TL4':['le_tl4 e','rs_tl4 s','tl2_tl4 n','tl3_tl4 w']} 
+        incoming_roads ={'TL1':['uw_tl1','tl3_tl1','tl2_tl1','ln_tl1'],
+                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue-tl2'],
+                         'TL3':['tl4_tl3','tl1_tl3','lw_tl3','ls_tl3'],
+                         'TL4':['le_tl4','rs_tl4','tl2_tl4','tl3_tl4']} 
 
         for car_id in car_list:
             edge_id = traci.vehicle.getRoadID(car_id)
             if edge_id in incoming_roads[TL]:
                 lane_id = traci.vehicle.getLaneID(car_id)
-
                 lane_pos = traci.vehicle.getLanePosition(car_id)
                 lane_pos = 750 - lane_pos  # inversion of lane pos, so if the car is close to the traffic light -> lane_pos = 0 --- 750 = max len of a road
-
                 # distance in meters from the traffic light -> mapping into cells
                 if lane_pos < 7:
                     lane_cell = 0
@@ -449,30 +458,21 @@ class Simulation:
         
                 # finding the lane where the car is located 
                 # x2TL_3 are the "turn left only" lanes
-                if lane_id == "uw_tl1_0" or lane_id == "uw_tl1_1" or lane_id == "uw_tl1_2" or lane_id == "rn_tl2_0" or lane_id == "rn_tl2_1" or lane_id == "rn_tl2_2" or lane_id == "tl4_tl3_0" or lane_id == "tl4_tl3_1" or lane_id == "tl4_tl3_2" or lane_id == "le_tl4_0" or lane_id == "le_tl4_1" or lane_id == "le_tl4_2" :
+                if lane_id in lane_groups[0]:
                     lane_group = 0
-                elif lane_id == "uw_tl1_3" or lane_id == "rn_tl2_3" or lane_id == "tl4_tl3_3" or lane_id == "le_tl4_3":
+                elif lane_id in lane_groups[1]:
                     lane_group = 1
-                elif lane_id == "tl3_tl1_0" or lane_id == "tl3_tl1_1" or lane_id == "tl3_tl1_2" or 
-                    lane_id == "tl1_tl2_0" or lane_id == "tl1_tl2_1" or lane_id == "tl1_tl2_2" or
-                    lane_id == "tl1_tl3_0" or lane_id == "tl1_tl3_1" or lane_id == "tl1_tl3_2" or
-                    lane_id == "rs_tl4_0" or lane_id == "rs_tl4_1" or lane_id == "rs_tl4_2" :
+                elif lane_id in lane_groups[2]:
                     lane_group = 2
-                elif lane_id == "tl3_tl1_3" or lane_id == "tl1_tl2_3" or lane_id == "tl1_tl3_3" or lane_id == "rs_tl4_3":
+                elif lane_id in lane_groups[3]:
                     lane_group = 3
-                elif lane_id == "tl2_tl1_0" or lane_id == "tl2_tl1_1" or lane_id == "tl2_tl1_2" or 
-                    lane_id == "tl4_tl2_0" or lane_id == "tl4_tl2_1" or lane_id == "tl4_tl2_2" or
-                    lane_id == "lw_tl3_0" or lane_id == "lw_tl3_1" or lane_id == "lw_tl3_2" or
-                    lane_id == "tl2_tl4_0" or lane_id == "tl2_tl4_1" or lane_id == "tl2_tl4_2" :
+                elif lane_id in lane_groups[4] :
                     lane_group = 4
-                elif lane_id == "tl2_tl1_3" or lane_id == "tl4_tl2_3" or lane_id == "lw_tl3_3" or lane_id == "tl2_tl4_3" :
+                elif lane_id in lane_groups[5]:
                     lane_group = 5
-                elif lane_id == "ln_tl1_0" or lane_id == "ln_tl1_1" or lane_id == "ln_tl1_2" or 
-                    lane_id == "ue_tl2_0" or lane_id == "ue-tl2_1" or lane_id == "ue-tl2_2" or
-                    lane_id == "ls_tl3_0" or lane_id == "ls_tl3_1" or lane_id == "ls_tl3_2" or
-                    lane_id == "tl3_tl4_0" or lane_id == "tl3_tl4_1" or lane_id == "tl3_tl4_2" :
+                elif lane_id in lane_groups[6]:
                     lane_group = 6
-                elif lane_id == "ln_tl1_3" lane_id == "ue-tl2_3" or lane_id == "ls_tl3_3" or lane_id == "tl3_tl4_3":
+                elif lane_id in lane_groups[7]: 
                     lane_group = 7
                 else:
                     lane_group = -1
@@ -493,38 +493,37 @@ class Simulation:
         return state
 
 
-    def _replay(self):
-        """
-        Retrieve a group of samples from the memory and for each of them update the learning equation, then train
-        """
-        batch_tl1 = self._Memories['TL1'].get_samples(self._Model.batch_size)
-        batch_tl2 = self._Memories['TL2'].get_samples(self._Model.batch_size)
-        batch_tl3 = self._Memories['TL3'].get_samples(self._Model.batch_size)
-        batch_tl4 = self._Memories['TL4'].get_samples(self._Model.batch_size)
-        batch=[batch_tl1,batch_tl2,batch_tl3_batch_tl4]
+    def _replay(self,TL):
+    
+        #Retrieve a group of samples from the memory and for each of them update the learning equation, then train
+        batch_tl1 = self._Memories['TL1'].get_samples(self._Models.batch_size)
+        batch_tl2 = self._Memories['TL2'].get_samples(self._Models.batch_size)
+        batch_tl3 = self._Memories['TL3'].get_samples(self._Models.batch_size)
+        batch_tl4 = self._Memories['TL4'].get_samples(self._Models.batch_size)
+        batch=[batch_tl1,batch_tl2,batch_tl3,batch_tl4]
         for x in range(4):
             if len(batch[x]) > 0:  # if the memory is full enough
-                states = np.array([val[0] for val in batch])  # extract states from the batch
-                next_states = np.array([val[3] for val in batch])  # extract next states from the batch
+                states = np.array([val[0] for val in batch[x]])  # extract states from the batch
+                next_states = np.array([val[3] for val in batch[x]])  # extract next states from the batch
 
                 # prediction
-                q_s_a = self._Model.predict_batch(states)  # predict Q(state), for every sample
-                q_s_a_d = self._Model.predict_batch(next_states)  # predict Q(next_state), for every sample
+                q_s_a = self._Models[TL].predict_batch(states)  # predict Q(state), for every sample
+                q_s_a_d = self._Models[TL].predict_batch(next_states)  # predict Q(next_state), for every sample
 
                 # setup training arrays
-                x = np.zeros((len(batch), self._num_states))
-                y = np.zeros((len(batch), self._num_actions))
+                x = np.zeros((len(batch[x]), self._num_states))
+                y = np.zeros((len(batch[x]), self._num_actions))
 
                 # DQN State,Q-Value--> how corrent is the action --> table {State0: Q-Value(action1),Q-Value(actoin2),...}
                 #in DQN --> NN calc. Q-Value  
-                for i, b in enumerate(batch): # i--> index of sample, b --> i-th sample , sample --> (old state, old action, reward, current_state)
+                for i, b in enumerate(batch[x]): # i--> index of sample, b --> i-th sample , sample --> (old state, old action, reward, current_state)
                     state, action, reward, _ = b[0], b[1], b[2], b[3]  # extract data from one sample
                     current_q = q_s_a[i]  # get the Q(state) predicted before
                     current_q[action] = reward + self._gamma * np.amax(q_s_a_d[i])  # update Q(state, action)
                     x[i] = state
                     y[i] = current_q  # Q(state) that includes the updated action value
 
-            self._Model.train_batch(x, y)  # train the NN
+            self._Models[TL].train_batch(x, y)  # train the NN
 
 
     def _save_episode_stats(self):
