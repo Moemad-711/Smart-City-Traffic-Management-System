@@ -201,14 +201,14 @@ class Simulation:
         return total_waiting_time
 
 
-    def _choose_action(self, state, epsilon):
+    def _choose_action(self, state, epsilon,TL):
         """
         Decide wheter to perform an explorative or exploitative action, according to an epsilon-greedy policy
         """
-        if random.random() < epsilon:
+        if random.random() < epsilon[TL]:
             return random.randint(0, self._num_actions - 1) # random action
         else:
-            return np.argmax(self._Model.predict_one(state)) # the best action given the current state
+            return np.argmax(self._Models.predict_one(state)) # the best action given the current state
 
     #Write method to get the Greenlight Time
     def get_green_duration(self,action): 
@@ -366,29 +366,29 @@ class Simulation:
         #print('     green_duration:', green_duration)
         return green_duration
 
-    def _set_yellow_phase(self, old_action):
+    def _set_yellow_phase(self, old_action,TL):
         """
         Activate the correct yellow light combination in sumo
         """
         yellow_phase_code = old_action * 2 + 1 # obtain the yellow phase code, based on the old action (ref on environment.net.xml)
-        traci.trafficlight.setPhase("TL", yellow_phase_code)
+        traci.trafficlight.setPhase(TL, yellow_phase_code)
 
 
-    def _set_green_phase(self, action_number):
+    def _set_green_phase(self, action_number,TL):
         """
         Activate the correct green light combination in sumo
         """
         if action_number == 0:
-            traci.trafficlight.setPhase("TL", PHASE_NS_GREEN)
+            traci.trafficlight.setPhase(TL, PHASE_NS_GREEN)
         elif action_number == 1:
-            traci.trafficlight.setPhase("TL", PHASE_NSL_GREEN)
+            traci.trafficlight.setPhase(TL, PHASE_NSL_GREEN)
         elif action_number == 2:
-            traci.trafficlight.setPhase("TL", PHASE_EW_GREEN)
+            traci.trafficlight.setPhase(TL, PHASE_EW_GREEN)
         elif action_number == 3:
-            traci.trafficlight.setPhase("TL", PHASE_EWL_GREEN)
+            traci.trafficlight.setPhase(TL, PHASE_EWL_GREEN)
 
 
-    def _get_queue_length(self,):
+    def _get_queue_length(self,TL):
         """
         Retrieve the number of cars with speed = 0 in every incoming lane
         """
@@ -396,11 +396,11 @@ class Simulation:
                          'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue-tl2'],
                          'TL3':['tl4_tl3','tl1_tl3','lw_tl3','ls_tl3'],
                          'TL4':['le_tl4','rs_tl4','tl2_tl4','tl3_tl4']} 
-
-        halt_N = traci.edge.getLastStepHaltingNumber()
-        halt_S = traci.edge.getLastStepHaltingNumber("S2TL")
-        halt_E = traci.edge.getLastStepHaltingNumber("E2TL")
-        halt_W = traci.edge.getLastStepHaltingNumber("W2TL")
+        result=incoming_roads[TL]
+        halt_N = traci.edge.getLastStepHaltingNumber(result[0])
+        halt_S = traci.edge.getLastStepHaltingNumber(result[1])
+        halt_E = traci.edge.getLastStepHaltingNumber(result[2])
+        halt_W = traci.edge.getLastStepHaltingNumber(result[3])
         queue_length = halt_N + halt_S + halt_E + halt_W
         return queue_length
 
