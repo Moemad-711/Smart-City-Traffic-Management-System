@@ -45,10 +45,13 @@ class Simulation:
         self._yellow_duration = yellow_duration
         self._num_states = num_states
         self._num_actions = num_actions
-        self._reward_store = []
-        self._cumulative_wait_store = []
-        self._avg_queue_length_store = []
+        self._reward_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
+        self._cumulative_wait_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
+        self._avg_queue_length_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
         self._training_epochs = training_epochs
+        self._current_phase_duration = {'TL1':0, 'TL2':0, 'TL3':0, 'TL4':0}
+        self._TL_list = ['TL1','TL2','TL3','TL4']
+
 
 
     def run(self, episode, epsilon):
@@ -64,39 +67,53 @@ class Simulation:
 
         # inits
         self._step = 0
-        self._waiting_times = [{},{},{},{}]
-        self._sum_neg_reward = [0,0,0,0]
-        self._sum_queue_length = [0,0,0,0]
-        self._sum_waiting_time = [0,0,0,0]
-        old_total_wait = [0,0,0,0]
-        old_state = [-1,-1,-1,-1]
-        old_action = [-1,-1,-1,-1]
+        self._waiting_times = {'TL1':{},'TL2':{},'TL3':{},'TL4':{}}
+        self._sum_neg_reward = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
+        self._sum_queue_length = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
+        self._sum_waiting_time = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
+        old_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
+        current_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
+        old_state = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
+        old_action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
+        action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
+        is_phase_green = {'TL1':False, 'TL2':False, 'TL3':False, 'TL4':False}
+        reward = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
+
 
         while self._step < self._max_steps:
+            for TL in self._TL_list:
+                if self._current_phase_duration[TL] ==0:
+                    if is_phase_green[TL]== True:
+                        # get current state of the intersection
+                        current_state = self._get_state(TL)
+           
 
-            # get current state of the intersection
-            current_state = self._get_state()
-
-            # calculate reward of previous action: (change in cumulative waiting time between actions)
-            # waiting time = seconds waited by a car since the spawn in the environment, cumulated for every car in incoming lanes
-            current_total_wait = self._collect_waiting_times()
-            reward = old_total_wait - current_total_wait
+                        # calculate reward of previous action: (change in cumulative waiting time between actions)
+                        # waiting time = seconds waited by a car since the spawn in the environment, cumulated for every car in incoming lanes
+                        current_total_wait[TL] = self._collect_waiting_times(TL)
+                        reward[TL] = old_total_wait[TL] - current_total_wait[TL]
             
-            # saving the data into the memory
-            if self._step != 0:
-                self._Memory.add_sample((old_state, old_action, reward, current_state))
+                        # saving the data into the memory
+                        if self._step != 0:
+                            self._Memory[TL].add_sample((old_state[TL], old_action[TL], reward[TL], current_state[TL]))
 
-            # choose the light phase to activate, based on the current state of the intersection
-            action = self._choose_action(current_state, epsilon)
+                        # choose the light phase to activate, based on the current state of the intersection
+                        action[TL] = self._choose_action(current_state, epsilon,TL)
 
-            # if the chosen phase is different from the last phase, activate the yellow phase
-            if self._step != 0 and old_action != action:
-                self._set_yellow_phase(old_action)
-                self._simulate(self._yellow_duration)
+                        # if the chosen phase is different from the last phase, activate the yellow phase
+                        if  old_action[TL] != action[TL]:
+                            self._set_yellow_phase(old_action[TL] , TL)
+                            is_phase_green[TL] = False
+                            self._current_phase_duration[TL] = self._yellow_duration
+                        else:
+                            self._current_phase_duration[TL] = self._green_duration
+                    else:
+                        # execute the phase selected before
+                        self._set_green_phase(action[TL], TL)
+                        is_phase_green[TL] = True
+                        self._current_phase_duration[TL] = self._green_duration
 
-            # execute the phase selected before
-            self._set_green_phase(action)
-            
+            self._simulate()
             #Call Method to Evaluate Greenlight Time
             greenlight_durations = self.get_green_duration(action=action)
             greenlight_durations =[x for x in greenlight_durations if x>0 and x<= 30]
@@ -111,13 +128,13 @@ class Simulation:
             #self._simulate(self._green_duration)
 
             # saving variables for later & accumulate reward
-            old_state = current_state
-            old_action = action
-            old_total_wait = current_total_wait
+            old_state[TL] = current_state[TL]
+            old_action[TL] = action[TL]
+            old_total_wait[TL] = current_total_wait[TL]
 
             # saving only the meaningful reward to better see if the agent is behaving correctly
-            if reward < 0:
-                self._sum_neg_reward += reward
+            if reward[TL] < 0:
+                self._sum_neg_reward[TL] += reward[TL]
 
         self._save_episode_stats()
         print("Total reward:", self._sum_neg_reward, "- Epsilon:", round(epsilon, 2))
@@ -134,51 +151,54 @@ class Simulation:
         return simulation_time, training_time
 
 
-    def _simulate(self, steps_todo):
+    def _simulate(self):
         """
         Execute steps in sumo while gathering statistics
         """
         #5400 if todo = 5 and step = 5397 --> 5402 --> todo = 3 
-        if (self._step + steps_todo) >= self._max_steps:  # do not do more steps than the maximum allowed number of steps
-            steps_todo = self._max_steps - self._step
+        
+        #print(' - Step:', self._step)
+        traci.simulationStep()  # simulate 1 step in sumo
 
-        while steps_todo > 0:
-            #print(' - Step:', self._step)
-            traci.simulationStep()  # simulate 1 step in sumo
+        # saving traffic features to st_memory                
+        north_speed = traci.edge.getLastStepMeanSpeed('N2TL')
+        north_count = traci.edge.getLastStepVehicleNumber('N2TL')
 
-            # saving traffic features to st_memory                
-            north_speed = traci.edge.getLastStepMeanSpeed('N2TL')
-            north_count = traci.edge.getLastStepVehicleNumber('N2TL')
+        south_speed = traci.edge.getLastStepMeanSpeed('S2TL')
+        south_count = traci.edge.getLastStepVehicleNumber('S2TL')
 
-            south_speed = traci.edge.getLastStepMeanSpeed('S2TL')
-            south_count = traci.edge.getLastStepVehicleNumber('S2TL')
+        west_speed = traci.edge.getLastStepMeanSpeed('W2TL')
+        west_count = traci.edge.getLastStepVehicleNumber('W2TL')
 
-            west_speed = traci.edge.getLastStepMeanSpeed('W2TL')
-            west_count = traci.edge.getLastStepVehicleNumber('W2TL')
+        east_speed = traci.edge.getLastStepMeanSpeed('E2TL')
+        east_count = traci.edge.getLastStepVehicleNumber('E2TL')
+        
+        sample_dict = pd.DataFrame(columns=['east_speed','east_count',
+                                            'west_speed','west_count',
+                                            'north_speed','north_count',
+                                            'south_speed','south_count'])
+        sample_dict = sample_dict.append({'east_speed': west_speed,'east_count': east_count,
+                                            'west_speed': east_speed,'west_count': west_count,
+                                            'north_speed': north_speed,'north_count': north_count,
+                                            'south_speed': south_speed,'south_count': south_count},
+                                            ignore_index=True)                                                
+        
+        sample = sample_dict.to_numpy()
+        self._st_meomry.add_sample(sample)
 
-            east_speed = traci.edge.getLastStepMeanSpeed('E2TL')
-            east_count = traci.edge.getLastStepVehicleNumber('E2TL')
-            
-            sample_dict = pd.DataFrame(columns=['east_speed','east_count',
-                                                'west_speed','west_count',
-                                                'north_speed','north_count',
-                                                'south_speed','south_count'])
-            sample_dict = sample_dict.append({'east_speed': west_speed,'east_count': east_count,
-                                              'west_speed': east_speed,'west_count': west_count,
-                                              'north_speed': north_speed,'north_count': north_count,
-                                              'south_speed': south_speed,'south_count': south_count},
-                                              ignore_index=True)                                                
-            
-            sample = sample_dict.to_numpy()
-            self._st_meomry.add_sample(sample)
-
-            self._step += 1 # update the step counter
-            steps_todo -= 1
-            queue_length = self._get_queue_length()
-            self._sum_queue_length += queue_length
-            self._sum_waiting_time += queue_length # 1 step while wating in queue means 1 second waited, for each car, therefore queue_lenght == waited_seconds
+        self._step += 1 # update the step counter
+        for TL in self._TL_list:
+            self._current_phase_duration[TL]-=1
+            queue_length[TL] = self._get_queue_length(TL)
+            self._sum_queue_length[TL] += queue_length[TL]
+            self._sum_waiting_time[TL] += queue_length[TL] # 1 step while wating in queue means 1 second waited, for each car, therefore queue_lenght == waited_seconds
 
 
+
+
+
+        
+       
     def _collect_waiting_times(self,TL):
         """
         Retrieve the waiting time of every car in the incoming roads
@@ -193,11 +213,11 @@ class Simulation:
             wait_time = traci.vehicle.getAccumulatedWaitingTime(car_id)
             road_id = traci.vehicle.getRoadID(car_id)  # get the road id where the car is located
             if road_id in incoming_roads[TL]:  # consider only the waiting times of cars in incoming roads
-                self._waiting_times[car_id] = wait_time
+                self._waiting_times[TL][car_id] = wait_time
             else:
-                if car_id in self._waiting_times: # a car that was tracked has cleared the intersection
-                    del self._waiting_times[car_id] 
-        total_waiting_time = sum(self._waiting_times.values())
+                if car_id in self._waiting_times[TL]: # a car that was tracked has cleared the intersection
+                    del self._waiting_times[TL][car_id] 
+        total_waiting_time = sum(self._waiting_times[TL].values())
         return total_waiting_time
 
 
@@ -401,8 +421,8 @@ class Simulation:
         halt_S = traci.edge.getLastStepHaltingNumber(result[1])
         halt_E = traci.edge.getLastStepHaltingNumber(result[2])
         halt_W = traci.edge.getLastStepHaltingNumber(result[3])
-        queue_length = halt_N + halt_S + halt_E + halt_W
-        return queue_length
+        queue_length[TL] = halt_N + halt_S + halt_E + halt_W
+        return queue_length[TL]
 
 
     def _get_state(self, TL):
@@ -493,30 +513,26 @@ class Simulation:
         return state
 
 
-    def _replay(self,TL):
+    def _replay(self):
     
         #Retrieve a group of samples from the memory and for each of them update the learning equation, then train
-        batch_tl1 = self._Memories['TL1'].get_samples(self._Models.batch_size)
-        batch_tl2 = self._Memories['TL2'].get_samples(self._Models.batch_size)
-        batch_tl3 = self._Memories['TL3'].get_samples(self._Models.batch_size)
-        batch_tl4 = self._Memories['TL4'].get_samples(self._Models.batch_size)
-        batch=[batch_tl1,batch_tl2,batch_tl3,batch_tl4]
-        for x in range(4):
-            if len(batch[x]) > 0:  # if the memory is full enough
-                states = np.array([val[0] for val in batch[x]])  # extract states from the batch
-                next_states = np.array([val[3] for val in batch[x]])  # extract next states from the batch
+        for TL in self._TL_list:
+            batch = self._Memories[TL].get_samples(self._Models[TL].batch_size)
+            if len(batch) > 0:  # if the memory is full enough
+                states = np.array([val[0] for val in batch])  # extract states from the batch
+                next_states = np.array([val[3] for val in batch])  # extract next states from the batch
 
                 # prediction
                 q_s_a = self._Models[TL].predict_batch(states)  # predict Q(state), for every sample
                 q_s_a_d = self._Models[TL].predict_batch(next_states)  # predict Q(next_state), for every sample
 
                 # setup training arrays
-                x = np.zeros((len(batch[x]), self._num_states))
-                y = np.zeros((len(batch[x]), self._num_actions))
+                x = np.zeros((len(batch), self._num_states))
+                y = np.zeros((len(batch), self._num_actions))
 
                 # DQN State,Q-Value--> how corrent is the action --> table {State0: Q-Value(action1),Q-Value(actoin2),...}
                 #in DQN --> NN calc. Q-Value  
-                for i, b in enumerate(batch[x]): # i--> index of sample, b --> i-th sample , sample --> (old state, old action, reward, current_state)
+                for i, b in enumerate(batch): # i--> index of sample, b --> i-th sample , sample --> (old state, old action, reward, current_state)
                     state, action, reward, _ = b[0], b[1], b[2], b[3]  # extract data from one sample
                     current_q = q_s_a[i]  # get the Q(state) predicted before
                     current_q[action] = reward + self._gamma * np.amax(q_s_a_d[i])  # update Q(state, action)
@@ -530,9 +546,10 @@ class Simulation:
         """
         Save the stats of the episode to plot the graphs at the end of the session
         """
-        self._reward_store.append(self._sum_neg_reward)  # how much negative reward in this episode
-        self._cumulative_wait_store.append(self._sum_waiting_time)  # total number of seconds waited by cars in this episode
-        self._avg_queue_length_store.append(self._sum_queue_length / self._max_steps)  # average number of queued cars per step, in this episode
+        for TL in self._TL_list:
+            self._reward_store.append(self._sum_neg_reward[TL])  # how much negative reward in this episode
+            self._cumulative_wait_store.append(self._sum_waiting_time[TL])  # total number of seconds waited by cars in this episode
+            self._avg_queue_length_store.append(self._sum_queue_length[TL] / self._max_steps)  # average number of queued cars per step, in this episode
 
 
     @property
