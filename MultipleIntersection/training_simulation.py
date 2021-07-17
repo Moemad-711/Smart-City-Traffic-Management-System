@@ -411,10 +411,10 @@ class Simulation:
         """
         state = np.zeros(self._num_states)
         car_list = traci.vehicle.getIDList()
-        incoming_roads ={'TL1':['uw_tl1','tl3_tl1','tl2_tl1','ln_tl1'],
-                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue-tl2'],
-                         'TL3':['tl4_tl3','tl1_tl3','lw_tl3','ls_tl3'],
-                         'TL4':['le_tl4','rs_tl4','tl2_tl4','tl3_tl4']} 
+        incoming_roads ={'TL1':['uw_tl1 w','tl3_tl1 s','tl2_tl1 e','ln_tl1 n'],
+                         'TL2':['rn_tl2 n','tl1_tl2 w','tl4_tl2 s','ue-tl2 e'],
+                         'TL3':['tl4_tl3 e','tl1_tl3 n','lw_tl3 w','ls_tl3 s'],
+                         'TL4':['le_tl4 e','rs_tl4 s','tl2_tl4 n','tl3_tl4 w']} 
 
         for car_id in car_list:
             edge_id = traci.vehicle.getRoadID(car_id)
@@ -468,7 +468,7 @@ class Simulation:
                 elif lane_id == "tl2_tl1_3" or lane_id == "tl4_tl2_3" or lane_id == "lw_tl3_3" or lane_id == "tl2_tl4_3" :
                     lane_group = 5
                 elif lane_id == "ln_tl1_0" or lane_id == "ln_tl1_1" or lane_id == "ln_tl1_2" or 
-                    lane_id == "ue-tl2_0" or lane_id == "ue-tl2_1" or lane_id == "ue-tl2_2" or
+                    lane_id == "ue_tl2_0" or lane_id == "ue-tl2_1" or lane_id == "ue-tl2_2" or
                     lane_id == "ls_tl3_0" or lane_id == "ls_tl3_1" or lane_id == "ls_tl3_2" or
                     lane_id == "tl3_tl4_0" or lane_id == "tl3_tl4_1" or lane_id == "tl3_tl4_2" :
                     lane_group = 6
