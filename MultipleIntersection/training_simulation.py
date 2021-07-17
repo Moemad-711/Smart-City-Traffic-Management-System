@@ -2,7 +2,7 @@ from numpy.core.numeric import NaN
 from numpy.lib.arraysetops import intersect1d
 from numpy.lib.function_base import average
 import pandas as pd
-from libsumo.libsumo import edge_getIDList, vehicle
+from libsumo.libsumo import edge, edge_getIDList, vehicle
 import traci
 import numpy as np
 import random
@@ -405,86 +405,90 @@ class Simulation:
         return queue_length
 
 
-    def _get_state(self):
+    def _get_state(self, TL):
         """
         Retrieve the state of the intersection from sumo, in the form of cell occupancy
         """
         state = np.zeros(self._num_states)
         car_list = traci.vehicle.getIDList()
+        incoming_roads ={'TL1':['uw_tl1','tl3_tl1','tl2_tl1','ln_tl1'],
+                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue-tl2'],
+                         'TL3':['tl4_tl3','tl1_tl3','lw_tl3','ls_tl3'],
+                         'TL4':['le_tl4','rs_tl4','tl2_tl4','tl3_tl4']} 
 
         for car_id in car_list:
-            lane_pos = traci.vehicle.getLanePosition(car_id)
-            lane_id = traci.vehicle.getLaneID(car_id)
-            lane_pos = 750 - lane_pos  # inversion of lane pos, so if the car is close to the traffic light -> lane_pos = 0 --- 750 = max len of a road
+            edge_id = traci.vehicle.getRoadID(car_id)
+            if edge_id in incoming_roads[TL]:
+                lane_id = traci.vehicle.getLaneID(car_id)
 
-            # distance in meters from the traffic light -> mapping into cells
-            if lane_pos < 7:
-                lane_cell = 0
-            elif lane_pos < 14:
-                lane_cell = 1
-            elif lane_pos < 21:
-                lane_cell = 2
-            elif lane_pos < 28:
-                lane_cell = 3
-            elif lane_pos < 40:
-                lane_cell = 4
-            elif lane_pos < 60:
-                lane_cell = 5
-            elif lane_pos < 100:
-                lane_cell = 6
-            elif lane_pos < 160:
-                lane_cell = 7
-            elif lane_pos < 400:
-                lane_cell = 8
-            elif lane_pos <= 750:
-                lane_cell = 9
+                lane_pos = traci.vehicle.getLanePosition(car_id)
+                lane_pos = 750 - lane_pos  # inversion of lane pos, so if the car is close to the traffic light -> lane_pos = 0 --- 750 = max len of a road
 
-      
-            # finding the lane where the car is located 
-            # x2TL_3 are the "turn left only" lanes
-            if lane_id == "uw_tl1_0" or lane_id == "uw_tl1_1" or lane_id == "uw_tl1_2" or 
-               lane_id == "rn_tl2_0" or lane_id == "rn_tl2_1" or lane_id == "rn_tl2_2" or
-               lane_id == "tl4_tl3_0" or lane_id == "tl4_tl3_1" or lane_id == "tl4_tl3_2" or
-               lane_id == "le_tl4_0" or lane_id == "le_tl4_1" or lane_id == "le_tl4_2" :
-                lane_group = 0
-            elif lane_id == "uw_tl1_3" or lane_id == "rn_tl2_3" or lane_id == "tl4_tl3_3" or lane_id == "le_tl4_3":
-                lane_group = 1
-            elif lane_id == "tl3_tl1_0" or lane_id == "tl3_tl1_1" or lane_id == "tl3_tl1_2" or 
-                 lane_id == "tl1_tl2_0" or lane_id == "tl1_tl2_1" or lane_id == "tl1_tl2_2" or
-                 lane_id == "tl1_tl3_0" or lane_id == "tl1_tl3_1" or lane_id == "tl1_tl3_2" or
-                 lane_id == "rs_tl4_0" or lane_id == "rs_tl4_1" or lane_id == "rs_tl4_2" :
-                lane_group = 2
-            elif lane_id == "tl3_tl1_3" or lane_id == "tl1_tl2_3" or lane_id == "tl1_tl3_3" or lane_id == "rs_tl4_3":
-                lane_group = 3
-            elif lane_id == "tl2_tl1_0" or lane_id == "tl2_tl1_1" or lane_id == "tl2_tl1_2" or 
-                 lane_id == "tl4_tl2_0" or lane_id == "tl4_tl2_1" or lane_id == "tl4_tl2_2" or
-                 lane_id == "lw_tl3_0" or lane_id == "lw_tl3_1" or lane_id == "lw_tl3_2" or
-                 lane_id == "tl2_tl4_0" or lane_id == "tl2_tl4_1" or lane_id == "tl2_tl4_2" :
-                lane_group = 4
-            elif lane_id == "tl2_tl1_3" or lane_id == "tl4_tl2_3" or lane_id == "lw_tl3_3" or lane_id == "tl2_tl4_3" :
-                lane_group = 5
-            elif lane_id == "ln_tl1_0" or lane_id == "ln_tl1_1" or lane_id == "ln_tl1_2" or 
-                 lane_id == "ue-tl2_0" or lane_id == "ue-tl2_1" or lane_id == "ue-tl2_2" or
-                 lane_id == "ls_tl3_0" or lane_id == "ls_tl3_1" or lane_id == "ls_tl3_2" or
-                 lane_id == "tl3_tl4_0" or lane_id == "tl3_tl4_1" or lane_id == "tl3_tl4_2" :
-                lane_group = 6
-            elif lane_id == "ln_tl1_3" lane_id == "ue-tl2_3" or lane_id == "ls_tl3_3" or lane_id == "tl3_tl4_3":
-                lane_group = 7
-            else:
-                lane_group = -1
-            #state: is an array 0 --> 79 if cell = 4 and lane group 7 --> 74
-            #lane: 0 --> 7 means that the car in incoming lanes with respect to TL if not range means 
-            if lane_group >= 1 and lane_group <= 7:
-                car_position = int(str(lane_group) + str(lane_cell))  # composition of the two postion ID to create a number in interval 0-79
-                valid_car = True
-            elif lane_group == 0:
-                car_position = lane_cell
-                valid_car = True
-            else:
-                valid_car = False  # flag for not detecting cars crossing the intersection or driving away from it
+                # distance in meters from the traffic light -> mapping into cells
+                if lane_pos < 7:
+                    lane_cell = 0
+                elif lane_pos < 14:
+                    lane_cell = 1
+                elif lane_pos < 21:
+                    lane_cell = 2
+                elif lane_pos < 28:
+                    lane_cell = 3
+                elif lane_pos < 40:
+                    lane_cell = 4
+                elif lane_pos < 60:
+                    lane_cell = 5
+                elif lane_pos < 100:
+                    lane_cell = 6
+                elif lane_pos < 160:
+                    lane_cell = 7
+                elif lane_pos < 400:
+                    lane_cell = 8
+                elif lane_pos <= 750:
+                    lane_cell = 9
 
-            if valid_car:
-                state[car_position] = 1  # write the position of the car car_id in the state array in the form of "cell occupied"
+        
+                # finding the lane where the car is located 
+                # x2TL_3 are the "turn left only" lanes
+                if lane_id == "uw_tl1_0" or lane_id == "uw_tl1_1" or lane_id == "uw_tl1_2" or lane_id == "rn_tl2_0" or lane_id == "rn_tl2_1" or lane_id == "rn_tl2_2" or lane_id == "tl4_tl3_0" or lane_id == "tl4_tl3_1" or lane_id == "tl4_tl3_2" or lane_id == "le_tl4_0" or lane_id == "le_tl4_1" or lane_id == "le_tl4_2" :
+                    lane_group = 0
+                elif lane_id == "uw_tl1_3" or lane_id == "rn_tl2_3" or lane_id == "tl4_tl3_3" or lane_id == "le_tl4_3":
+                    lane_group = 1
+                elif lane_id == "tl3_tl1_0" or lane_id == "tl3_tl1_1" or lane_id == "tl3_tl1_2" or 
+                    lane_id == "tl1_tl2_0" or lane_id == "tl1_tl2_1" or lane_id == "tl1_tl2_2" or
+                    lane_id == "tl1_tl3_0" or lane_id == "tl1_tl3_1" or lane_id == "tl1_tl3_2" or
+                    lane_id == "rs_tl4_0" or lane_id == "rs_tl4_1" or lane_id == "rs_tl4_2" :
+                    lane_group = 2
+                elif lane_id == "tl3_tl1_3" or lane_id == "tl1_tl2_3" or lane_id == "tl1_tl3_3" or lane_id == "rs_tl4_3":
+                    lane_group = 3
+                elif lane_id == "tl2_tl1_0" or lane_id == "tl2_tl1_1" or lane_id == "tl2_tl1_2" or 
+                    lane_id == "tl4_tl2_0" or lane_id == "tl4_tl2_1" or lane_id == "tl4_tl2_2" or
+                    lane_id == "lw_tl3_0" or lane_id == "lw_tl3_1" or lane_id == "lw_tl3_2" or
+                    lane_id == "tl2_tl4_0" or lane_id == "tl2_tl4_1" or lane_id == "tl2_tl4_2" :
+                    lane_group = 4
+                elif lane_id == "tl2_tl1_3" or lane_id == "tl4_tl2_3" or lane_id == "lw_tl3_3" or lane_id == "tl2_tl4_3" :
+                    lane_group = 5
+                elif lane_id == "ln_tl1_0" or lane_id == "ln_tl1_1" or lane_id == "ln_tl1_2" or 
+                    lane_id == "ue-tl2_0" or lane_id == "ue-tl2_1" or lane_id == "ue-tl2_2" or
+                    lane_id == "ls_tl3_0" or lane_id == "ls_tl3_1" or lane_id == "ls_tl3_2" or
+                    lane_id == "tl3_tl4_0" or lane_id == "tl3_tl4_1" or lane_id == "tl3_tl4_2" :
+                    lane_group = 6
+                elif lane_id == "ln_tl1_3" lane_id == "ue-tl2_3" or lane_id == "ls_tl3_3" or lane_id == "tl3_tl4_3":
+                    lane_group = 7
+                else:
+                    lane_group = -1
+                #state: is an array 0 --> 79 if cell = 4 and lane group 7 --> 74
+                #lane: 0 --> 7 means that the car in incoming lanes with respect to TL if not range means 
+                if lane_group >= 1 and lane_group <= 7:
+                    car_position = int(str(lane_group) + str(lane_cell))  # composition of the two postion ID to create a number in interval 0-79
+                    valid_car = True
+                elif lane_group == 0:
+                    car_position = lane_cell
+                    valid_car = True
+                else:
+                    valid_car = False  # flag for not detecting cars crossing the intersection or driving away from it
+
+                if valid_car:
+                    state[car_position] = 1  # write the position of the car car_id in the state array in the form of "cell occupied"
 
         return state
 
