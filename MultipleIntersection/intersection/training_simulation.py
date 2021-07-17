@@ -64,13 +64,13 @@ class Simulation:
 
         # inits
         self._step = 0
-        self._waiting_times = {}
-        self._sum_neg_reward = 0
-        self._sum_queue_length = 0
-        self._sum_waiting_time = 0
-        old_total_wait = 0
-        old_state = -1
-        old_action = -1
+        self._waiting_times = [{},{},{},{}]
+        self._sum_neg_reward = [0,0,0,0]
+        self._sum_queue_length = [0,0,0,0]
+        self._sum_waiting_time = [0,0,0,0]
+        old_total_wait = [0,0,0,0]
+        old_state = [-1,-1,-1,-1]
+        old_action = [-1,-1,-1,-1]
 
         while self._step < self._max_steps:
 
@@ -97,10 +97,10 @@ class Simulation:
             # execute the phase selected before
             self._set_green_phase(action)
             
-            # TODO: Call Method to Evaluate Greenlight Time
+            #Call Method to Evaluate Greenlight Time
             greenlight_durations = self.get_green_duration(action=action)
             greenlight_durations =[x for x in greenlight_durations if x>0 and x<= 30]
-            print(' greenlight_durations: ', greenlight_durations)
+            print('greenlight_durations: ', greenlight_durations)
             if len(greenlight_durations) > 0:
                 greenlight_duration = math.ceil(min(greenlight_durations))
                 print(' green_duration: ',greenlight_duration )
@@ -210,7 +210,7 @@ class Simulation:
         else:
             return np.argmax(self._Model.predict_one(state)) # the best action given the current state
 
-    #TODO: Write method to get the Greenlight Time
+    #Write method to get the Greenlight Time
     def get_green_duration(self,action): 
         """
         Returns The Minimum of current demand and future demand Greenlight Times
@@ -388,11 +388,16 @@ class Simulation:
             traci.trafficlight.setPhase("TL", PHASE_EWL_GREEN)
 
 
-    def _get_queue_length(self):
+    def _get_queue_length(self,):
         """
         Retrieve the number of cars with speed = 0 in every incoming lane
         """
-        halt_N = traci.edge.getLastStepHaltingNumber("N2TL")
+        incoming_roads ={'TL1':['uw_tl1','tl3_tl1','tl2_tl1','ln_tl1'],
+                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue-tl2'],
+                         'TL3':['tl4_tl3','tl1_tl3','lw_tl3','ls_tl3'],
+                         'TL4':['le_tl4','rs_tl4','tl2_tl4','tl3_tl4']} 
+
+        halt_N = traci.edge.getLastStepHaltingNumber()
         halt_S = traci.edge.getLastStepHaltingNumber("S2TL")
         halt_E = traci.edge.getLastStepHaltingNumber("E2TL")
         halt_W = traci.edge.getLastStepHaltingNumber("W2TL")
@@ -488,28 +493,32 @@ class Simulation:
         """
         Retrieve a group of samples from the memory and for each of them update the learning equation, then train
         """
-        batch = self._Memory.get_samples(self._Model.batch_size)
+        batch_tl1 = self._Memories['TL1'].get_samples(self._Model.batch_size)
+        batch_tl2 = self._Memories['TL2'].get_samples(self._Model.batch_size)
+        batch_tl3 = self._Memories['TL3'].get_samples(self._Model.batch_size)
+        batch_tl4 = self._Memories['TL4'].get_samples(self._Model.batch_size)
+        batch=[batch_tl1,batch_tl2,batch_tl3_batch_tl4]
+        for x in range(4):
+            if len(batch[x]) > 0:  # if the memory is full enough
+                states = np.array([val[0] for val in batch])  # extract states from the batch
+                next_states = np.array([val[3] for val in batch])  # extract next states from the batch
 
-        if len(batch) > 0:  # if the memory is full enough
-            states = np.array([val[0] for val in batch])  # extract states from the batch
-            next_states = np.array([val[3] for val in batch])  # extract next states from the batch
+                # prediction
+                q_s_a = self._Model.predict_batch(states)  # predict Q(state), for every sample
+                q_s_a_d = self._Model.predict_batch(next_states)  # predict Q(next_state), for every sample
 
-            # prediction
-            q_s_a = self._Model.predict_batch(states)  # predict Q(state), for every sample
-            q_s_a_d = self._Model.predict_batch(next_states)  # predict Q(next_state), for every sample
+                # setup training arrays
+                x = np.zeros((len(batch), self._num_states))
+                y = np.zeros((len(batch), self._num_actions))
 
-            # setup training arrays
-            x = np.zeros((len(batch), self._num_states))
-            y = np.zeros((len(batch), self._num_actions))
-
-            # DQN State,Q-Value--> how corrent is the action --> table {State0: Q-Value(action1),Q-Value(actoin2),...}
-            #in DQN --> NN calc. Q-Value  
-            for i, b in enumerate(batch): # i--> index of sample, b --> i-th sample , sample --> (old state, old action, reward, current_state)
-                state, action, reward, _ = b[0], b[1], b[2], b[3]  # extract data from one sample
-                current_q = q_s_a[i]  # get the Q(state) predicted before
-                current_q[action] = reward + self._gamma * np.amax(q_s_a_d[i])  # update Q(state, action)
-                x[i] = state
-                y[i] = current_q  # Q(state) that includes the updated action value
+                # DQN State,Q-Value--> how corrent is the action --> table {State0: Q-Value(action1),Q-Value(actoin2),...}
+                #in DQN --> NN calc. Q-Value  
+                for i, b in enumerate(batch): # i--> index of sample, b --> i-th sample , sample --> (old state, old action, reward, current_state)
+                    state, action, reward, _ = b[0], b[1], b[2], b[3]  # extract data from one sample
+                    current_q = q_s_a[i]  # get the Q(state) predicted before
+                    current_q[action] = reward + self._gamma * np.amax(q_s_a_d[i])  # update Q(state, action)
+                    x[i] = state
+                    y[i] = current_q  # Q(state) that includes the updated action value
 
             self._Model.train_batch(x, y)  # train the NN
 
