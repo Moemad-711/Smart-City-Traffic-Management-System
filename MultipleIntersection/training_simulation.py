@@ -68,17 +68,17 @@ class Simulation:
         # inits
         self._step = 0
         self._waiting_times = {'TL1':{},'TL2':{},'TL3':{},'TL4':{}}
-        self._sum_neg_reward = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
-        self._sum_queue_length = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
-        self._sum_waiting_time = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
-        old_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
-        current_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
-        old_state = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
-        old_action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
-        action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
+        self._sum_neg_reward = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
+        self._sum_queue_length = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
+        self._sum_waiting_time = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
+        old_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
+        current_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
+        old_state = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
+        old_action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
+        action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
         is_phase_green = {'TL1':True, 'TL2':True, 'TL3':True, 'TL4':True}
-        reward = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
-
+        reward = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
+        current_state = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
 
         while self._step < self._max_steps:
             for TL in self._TL_list:
@@ -94,7 +94,7 @@ class Simulation:
                                 self._sum_neg_reward[TL] += reward[TL]
 
                         # get current state of the intersection
-                        current_state = self._get_state(TL)
+                        current_state[TL] = self._get_state(TL)
            
 
                         # calculate reward of previous action: (change in cumulative waiting time between actions)
@@ -104,17 +104,19 @@ class Simulation:
             
                         # saving the data into the memory
                         if self._step != 0:
-                            self._Memory[TL].add_sample((old_state[TL], old_action[TL], reward[TL], current_state[TL]))
+                            self._Memories[TL].add_sample((old_state[TL], old_action[TL], reward[TL], current_state[TL]))
 
                         # choose the light phase to activate, based on the current state of the intersection
-                        action[TL] = self._choose_action(current_state, epsilon,TL)
+                        action[TL] = self._choose_action(current_state[TL], epsilon,TL)
 
                         # if the chosen phase is different from the last phase, activate the yellow phase
-                        if  old_action[TL] != action[TL]:
+                        if self._step !=0 and old_action[TL] != action[TL]:
                             self._set_yellow_phase(old_action[TL] , TL)
                             is_phase_green[TL] = False
                             self._current_phase_duration[TL] = self._yellow_duration
                         else:
+                            self._set_green_phase(action[TL], TL)
+                            is_phase_green[TL] = True
                             self._current_phase_duration[TL] = self._green_duration
                     else:
                         # execute the phase selected before
@@ -161,30 +163,30 @@ class Simulation:
         traci.simulationStep()  # simulate 1 step in sumo
 
         # saving traffic features to st_memory                
-        north_speed = traci.edge.getLastStepMeanSpeed('N2TL')
-        north_count = traci.edge.getLastStepVehicleNumber('N2TL')
+        #north_speed = traci.edge.getLastStepMeanSpeed('N2TL')
+        #north_count = traci.edge.getLastStepVehicleNumber('N2TL')
 
-        south_speed = traci.edge.getLastStepMeanSpeed('S2TL')
-        south_count = traci.edge.getLastStepVehicleNumber('S2TL')
+        #south_speed = traci.edge.getLastStepMeanSpeed('S2TL')
+        #south_count = traci.edge.getLastStepVehicleNumber('S2TL')
 
-        west_speed = traci.edge.getLastStepMeanSpeed('W2TL')
-        west_count = traci.edge.getLastStepVehicleNumber('W2TL')
+        #west_speed = traci.edge.getLastStepMeanSpeed('W2TL')
+        #west_count = traci.edge.getLastStepVehicleNumber('W2TL')
 
-        east_speed = traci.edge.getLastStepMeanSpeed('E2TL')
-        east_count = traci.edge.getLastStepVehicleNumber('E2TL')
+        #east_speed = traci.edge.getLastStepMeanSpeed('E2TL')
+        #east_count = traci.edge.getLastStepVehicleNumber('E2TL')
         
-        sample_dict = pd.DataFrame(columns=['east_speed','east_count',
-                                            'west_speed','west_count',
-                                            'north_speed','north_count',
-                                            'south_speed','south_count'])
-        sample_dict = sample_dict.append({'east_speed': west_speed,'east_count': east_count,
-                                            'west_speed': east_speed,'west_count': west_count,
-                                            'north_speed': north_speed,'north_count': north_count,
-                                            'south_speed': south_speed,'south_count': south_count},
-                                            ignore_index=True)                                                
+        #sample_dict = pd.DataFrame(columns=['east_speed','east_count',
+        #                                    'west_speed','west_count',
+        #                                    'north_speed','north_count',
+        #                                    'south_speed','south_count'])
+        #sample_dict = sample_dict.append({'east_speed': west_speed,'east_count': east_count,
+        #                                    'west_speed': east_speed,'west_count': west_count,
+        #                                    'north_speed': north_speed,'north_count': north_count,
+        #                                    'south_speed': south_speed,'south_count': south_count},
+        #                                    ignore_index=True)                                                
         
-        sample = sample_dict.to_numpy()
-        self._st_meomry.add_sample(sample)
+        #sample = sample_dict.to_numpy()
+        #self._st_meomry.add_sample(sample)
 
         self._step += 1 # update the step counter
         for TL in self._TL_list:
@@ -205,7 +207,7 @@ class Simulation:
         """
         
         incoming_roads ={'TL1':['uw_tl1','tl3_tl1','tl2_tl1','ln_tl1'],
-                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue-tl2'],
+                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue_tl2'],
                          'TL3':['tl4_tl3','tl1_tl3','lw_tl3','ls_tl3'],
                          'TL4':['le_tl4','rs_tl4','tl2_tl4','tl3_tl4']} 
         car_list = traci.vehicle.getIDList()
@@ -413,7 +415,7 @@ class Simulation:
         Retrieve the number of cars with speed = 0 in every incoming lane
         """
         incoming_roads ={'TL1':['uw_tl1','tl3_tl1','tl2_tl1','ln_tl1'],
-                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue-tl2'],
+                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue_tl2'],
                          'TL3':['tl4_tl3','tl1_tl3','lw_tl3','ls_tl3'],
                          'TL4':['le_tl4','rs_tl4','tl2_tl4','tl3_tl4']} 
         result=incoming_roads[TL]
@@ -430,12 +432,12 @@ class Simulation:
         Retrieve the state of the intersection from sumo, in the form of cell occupancy
         """
         straights={'weast':['uw_tl1_0','uw_tl1_1','uw_tl1_2','tl1_tl2_0','tl1_tl2_1','tl1_tl2_2','lw_tl3_0','lw_tl3_1','lw_tl3_2','tl3_tl4_0','tl3_tl4_1','tl3_tl4_2'],
-                    'east':['tl2_tl1_0','tl2_tl1_1','tl2_tl1_2','ue-tl2_0','ue-tl2_1','ue-tl2_2','tl4_tl3_0','tl4_tl3_1','tl4_tl3_2','le_tl4_0','le_tl4_1','le_tl4_2'],
+                    'east':['tl2_tl1_0','tl2_tl1_1','tl2_tl1_2','ue_tl2_0','ue_tl2_1','ue_tl2_2','tl4_tl3_0','tl4_tl3_1','tl4_tl3_2','le_tl4_0','le_tl4_1','le_tl4_2'],
                     'south':['tl3_tl1_0','tl3_tl1_1','tl3_tl1_2','tl4_tl2_0','tl4_tl2_1','tl4_tl2_2','ls_tl3_0','ls_tl3_1','ls_tl3_2','rs_tl4_0','rs_tl4_1','rs_tl4_2'],
                     'north':['ln_tl1_0','ln_tl1_1','ln_tl1_2','rn_tl2_0','rn_tl2_1','rn_tl2_2','tl1_tl3_0','tl1_tl3_1','tl1_tl3_2','tl2_tl4_0','tl2_tl4_1','tl2_tl4_2']}
         
         turns={     'weast':['uw_tl1_3','tl1_tl2_3','lw_tl3_3','tl3_tl4_3'],
-                    'east':['tl2_tl1_3','ue-tl2_3','tl4_tl3_3','le_tl4_3'],
+                    'east':['tl2_tl1_3','ue_tl2_3','tl4_tl3_3','le_tl4_3'],
                     'south':['tl3_tl1_3','tl4_tl2_3','ls_tl3_3','rs_tl4_3'],
                     'north':['ln_tl1_3','rn_tl2_3','tl1_tl3_3','tl2_tl4_3']}
         lane_groups=[straights['weast'],turns['weast'],straights['east'],turns['east'],
@@ -443,7 +445,7 @@ class Simulation:
         state = np.zeros(self._num_states)
         car_list = traci.vehicle.getIDList()
         incoming_roads ={'TL1':['uw_tl1','tl3_tl1','tl2_tl1','ln_tl1'],
-                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue-tl2'],
+                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue_tl2'],
                          'TL3':['tl4_tl3','tl1_tl3','lw_tl3','ls_tl3'],
                          'TL4':['le_tl4','rs_tl4','tl2_tl4','tl3_tl4']} 
 
@@ -532,7 +534,7 @@ class Simulation:
 
                 # DQN State,Q-Value--> how corrent is the action --> table {State0: Q-Value(action1),Q-Value(actoin2),...}
                 #in DQN --> NN calc. Q-Value  
-                for i, b in enumerate(batch): # i--> index of sample, b --> i-th sample , sample --> (old state, old action, reward, current_state)
+                for i, b in enumerate(batch): # i--> index of sample, b --> i-th sample , sample --> (old state, old action, reward, current_state[TL])
                     state, action, reward, _ = b[0], b[1], b[2], b[3]  # extract data from one sample
                     current_q = q_s_a[i]  # get the Q(state) predicted before
                     current_q[action] = reward + self._gamma * np.amax(q_s_a_d[i])  # update Q(state, action)

@@ -36,7 +36,7 @@ class Simulation:
                 'tl4' :{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0}
                 }
         edges_direction={    'west':['uw_tl1','tl1_tl2','lw_tl3','tl3_tl4'],
-                             'east':['tl2_tl1','ue-tl2','tl4_tl3','le_tl4'],
+                             'east':['tl2_tl1','ue_tl2','tl4_tl3','le_tl4'],
                              'south':['tl3_tl1','tl4_tl2','ls_tl3','rs_tl4'],
                              'north':['ln_tl1','rn_tl2','tl1_tl3','tl2_tl4'] }
         while self._step < self._max_steps:
@@ -99,10 +99,10 @@ class Simulation:
                 'tl3' :{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0},
                 'tl4' :{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0}
                 }
-        edges_direction={    'west':['uw_tl1','tl1_tl2','lw_tl3','tl3_tl4'],
-                             'east':['tl2_tl1','ue-tl2','tl4_tl3','le_tl4'],
-                             'south':['tl3_tl1','tl4_tl2','ls_tl3','rs_tl4'],
-                             'north':['ln_tl1','rn_tl2','tl1_tl3','tl2_tl4'] }
+        edges_direction={'west':['uw_tl1','tl1_tl2','lw_tl3','tl3_tl4'],
+                         'east':['tl2_tl1','ue_tl2','tl4_tl3','le_tl4'],
+                         'south':['tl3_tl1','tl4_tl2','ls_tl3','rs_tl4'],
+                         'north':['ln_tl1','rn_tl2','tl1_tl3','tl2_tl4']}
         
         while self._step < self._max_steps:
             traci.simulationStep()
