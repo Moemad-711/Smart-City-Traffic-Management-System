@@ -76,7 +76,7 @@ class Simulation:
         old_state = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
         old_action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
         action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
-        is_phase_green = {'TL1':False, 'TL2':False, 'TL3':False, 'TL4':False}
+        is_phase_green = {'TL1':True, 'TL2':True, 'TL3':True, 'TL4':True}
         reward = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
 
 
