@@ -130,8 +130,10 @@ class Simulation:
                     
 
             for tl in TL_Nodes:      
-                    current_data = [self._step,tl,nodes[node]['east_speed'],nodes[node]['east_count'],nodes[node]['west_speed'],nodes[node]['west_count']
-                    ,nodes[node]['north_speed'],nodes[node]['north_count'],nodes[node]['south_speed'],nodes[node]['south_count']]
+                    current_data = [self._step,tl,nodes[tl]['east_speed'],nodes[tl]['east_count'],
+                                                  nodes[tl]['west_speed'],nodes[tl]['west_count'],
+                                                  nodes[tl]['north_speed'],nodes[tl]['north_count'],
+                                                  nodes[tl]['south_speed'],nodes[tl]['south_count']]
                     allDataList.append(current_data)
             self._step += 1
         
