@@ -46,7 +46,7 @@ class Simulation:
                 node = str(edge).split('_')[1]
                 if node in TL_Nodes:
                     vehicle_count = traci.edge.getLastStepVehicleNumber(edge)
-                    if vehicle_count ==0: avg_speed = 0
+                    if vehicle_count == 0: avg_speed = 0
                     else: avg_speed = traci.edge.getLastStepMeanSpeed(edge)
 
                     ## Data ---> Dataframe? ----> numpy array(batch_size(time_steps),4,8) 
@@ -116,9 +116,9 @@ class Simulation:
                 if node in TL_Nodes:
                     avg_speed = traci.edge.getLastStepMeanSpeed(edge)
                     vehicle_count = traci.edge.getLastStepVehicleNumber(edge)
-                    ## Data ---> Dataframe? ----> numpy array(batch_size(time_steps),4,8) 
-                    Timestamp = self._step
-                    Node = node
+                    if vehicle_count == 0: avg_speed = 0
+                    else: avg_speed = traci.edge.getLastStepMeanSpeed(edge)
+
                     if edge in edges_direction['west']:
                         nodes[node]['west_speed'] = avg_speed
                         nodes[node]['west_count'] = vehicle_count
