@@ -189,9 +189,9 @@ class Simulation:
         self._step += 1 # update the step counter
         for TL in self._TL_list:
             self._current_phase_duration[TL]-=1
-            queue_length[TL] = self._get_queue_length(TL)
-            self._sum_queue_length[TL] += queue_length[TL]
-            self._sum_waiting_time[TL] += queue_length[TL] # 1 step while wating in queue means 1 second waited, for each car, therefore queue_lenght == waited_seconds
+            queue_length = self._get_queue_length(TL)
+            self._sum_queue_length[TL] += queue_length
+            self._sum_waiting_time[TL] += queue_length # 1 step while wating in queue means 1 second waited, for each car, therefore queue_lenght == waited_seconds
 
 
 
@@ -421,8 +421,8 @@ class Simulation:
         halt_S = traci.edge.getLastStepHaltingNumber(result[1])
         halt_E = traci.edge.getLastStepHaltingNumber(result[2])
         halt_W = traci.edge.getLastStepHaltingNumber(result[3])
-        queue_length[TL] = halt_N + halt_S + halt_E + halt_W
-        return queue_length[TL]
+        queue_length = halt_N + halt_S + halt_E + halt_W
+        return queue_length
 
 
     def _get_state(self, TL):
