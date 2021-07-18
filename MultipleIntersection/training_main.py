@@ -120,7 +120,8 @@ if __name__ == "__main__":
     print("----- End time:", datetime.datetime.now())
     print("----- Session info saved at:", path)
 
-    Model.save_model(path)
+    for TL in Simulation._TL_list:
+        Models[TL].save_model(path, TL)
 
     copyfile(src='training_settings.ini', dst=os.path.join(path, 'training_settings.ini'))
 
