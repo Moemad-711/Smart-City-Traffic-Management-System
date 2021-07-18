@@ -60,58 +60,39 @@ class Simulation:
         action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
         is_phase_green = {'TL1':False, 'TL2':False, 'TL3':False, 'TL4':False}
         reward = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
+        old_action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
 
         while self._step < self._max_steps:
             for TL in self._TL_list:
                 if self._current_phase_duration[TL] ==0:
+                    if is_phase_green[TL]== True:
                         if self._step != 0:
                             old_total_wait[TL] = current_total_wait[TL]
+                            old_action[TL] = action[TL]
+
                             # saving only the meaningful reward to better see if the agent is behaving correctly
                             if reward[TL] < 0:
-                                self._sum_neg_reward[TL] += reward[TL]
+                                self._sum_neg_reward[TL] += reward[TL]           
                         # calculate reward of previous action: (change in cumulative waiting time between actions)
                         # waiting time = seconds waited by a car since the spawn in the environment, cumulated for every car in incoming lanes
                         current_total_wait[TL] = self._collect_waiting_times(TL)
                         reward[TL] = old_total_wait[TL] - current_total_wait[TL]
             
-                        # saving the data into the memory
-
                         # choose the light phase to activate, based on the current state of the intersection
                         action[TL] = self._choose_action(TL)
-
                         # if the chosen phase is different from the last phase, activate the yellow phase
-                        self._set_yellow_phase(action[TL] , TL)
+                        self._set_yellow_phase(old_action[TL] , TL)
+                        is_phase_green[TL] = False
                         self._current_phase_duration[TL] = self._yellow_duration
-                        self._current_phase_duration[TL] = self._green_duration
+                    else:
                         # execute the phase selected before
                         self._set_green_phase(action[TL], TL)
                         is_phase_green[TL] = True
                         self._current_phase_duration[TL] = self._green_duration
 
-            self._simulate()
-            #Call Method to Evaluate Greenlight Time
-            #greenlight_durations = self.get_green_duration(action=action)
-            #greenlight_durations =[x for x in greenlight_durations if x>0 and x<= 30]
-            #print('greenlight_durations: ', greenlight_durations)
-            #if len(greenlight_durations) > 0:
-            #    greenlight_duration = math.ceil(min(greenlight_durations))
-            #    print(' green_duration: ',greenlight_duration )
-            #    self._simulate(greenlight_duration)
-            #else:
-            #    self._simulate(self._green_duration)
-            
-            #self._simulate(self._green_duration)
-
+            self._simulate() 
         traci.close()
         simulation_time = round(timeit.default_timer() - start_time, 1)
-
-        #Train the model
-        print("Training...")
-        start_time = timeit.default_timer()
-        for _ in range(self._training_epochs):
-            self._replay()
-        training_time = round(timeit.default_timer() - start_time, 1)
-
         return simulation_time
 
 
@@ -147,8 +128,7 @@ class Simulation:
         return total_waiting_time
 
     def _choose_action(self,TL):
-        self._action[TL]=(self._action[TL]+1)%4
-        return retself._action[TL]
+        return (self._action[TL]+1)%4
     #Write method to get the Greenlight Time
     def get_green_duration(self,action): 
         """
