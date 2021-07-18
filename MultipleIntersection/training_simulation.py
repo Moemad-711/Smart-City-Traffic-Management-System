@@ -84,6 +84,15 @@ class Simulation:
             for TL in self._TL_list:
                 if self._current_phase_duration[TL] ==0:
                     if is_phase_green[TL]== True:
+                        if self._step != 0:
+                            # saving variables for later & accumulate reward
+                            old_state[TL] = current_state[TL]
+                            old_action[TL] = action[TL]
+                            old_total_wait[TL] = current_total_wait[TL]
+                            # saving only the meaningful reward to better see if the agent is behaving correctly
+                            if reward[TL] < 0:
+                                self._sum_neg_reward[TL] += reward[TL]
+
                         # get current state of the intersection
                         current_state = self._get_state(TL)
            
@@ -115,26 +124,17 @@ class Simulation:
 
             self._simulate()
             #Call Method to Evaluate Greenlight Time
-            greenlight_durations = self.get_green_duration(action=action)
-            greenlight_durations =[x for x in greenlight_durations if x>0 and x<= 30]
-            print('greenlight_durations: ', greenlight_durations)
-            if len(greenlight_durations) > 0:
-                greenlight_duration = math.ceil(min(greenlight_durations))
-                print(' green_duration: ',greenlight_duration )
-                self._simulate(greenlight_duration)
-            else:
-                self._simulate(self._green_duration)
+            #greenlight_durations = self.get_green_duration(action=action)
+            #greenlight_durations =[x for x in greenlight_durations if x>0 and x<= 30]
+            #print('greenlight_durations: ', greenlight_durations)
+            #if len(greenlight_durations) > 0:
+            #    greenlight_duration = math.ceil(min(greenlight_durations))
+            #    print(' green_duration: ',greenlight_duration )
+            #    self._simulate(greenlight_duration)
+            #else:
+            #    self._simulate(self._green_duration)
             
             #self._simulate(self._green_duration)
-
-            # saving variables for later & accumulate reward
-            old_state[TL] = current_state[TL]
-            old_action[TL] = action[TL]
-            old_total_wait[TL] = current_total_wait[TL]
-
-            # saving only the meaningful reward to better see if the agent is behaving correctly
-            if reward[TL] < 0:
-                self._sum_neg_reward[TL] += reward[TL]
 
         self._save_episode_stats()
         print("Total reward:", self._sum_neg_reward, "- Epsilon:", round(epsilon, 2))
