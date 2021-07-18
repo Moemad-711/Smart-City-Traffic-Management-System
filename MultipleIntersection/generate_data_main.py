@@ -7,7 +7,7 @@ import os
 from mpi4py import MPI
 from generate_data_smulation import Simulation
 from generator import TrafficGenerator
-from utils import import_generate_data_configuration, set_sumo, set_raw_traffic_data_path
+from utils import import_generate_data_configuration, set_sumo, set_traffic_features_path
 
 
 if __name__ == "__main__":
@@ -20,7 +20,7 @@ if __name__ == "__main__":
         config = import_generate_data_configuration(config_file='generate_data_settings.ini')
         #sumo_cmd = set_sumo(config['gui'], os.path.join('routes','sumo_config_%i.sumocfg' %(rank)), config['max_steps'])
         #print('SUMO_CMD: ', sumo_cmd)
-        path = set_raw_traffic_data_path(config['traffic_data_path_name'])
+        path = set_traffic_features_path(config['traffic_data_path_name'])
     
     else:
         config = None
