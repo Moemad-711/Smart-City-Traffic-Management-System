@@ -210,7 +210,8 @@ def data_split(dataset: pd.DataFrame, train_split, batch_size: int, prediction_s
     """
     Splits The Dataset into Train and Validate sets based on train_split
     """
-    data = dataset.to_numpy()
+    data = dataset.to_numpy() #2D array
+    # write code time*node*features(8) 3D
     data_reshaped = data.reshape(data.shape[0], 1, data.shape[1])
 
     #prediction_steps = int(batch_size/kernel_size)
