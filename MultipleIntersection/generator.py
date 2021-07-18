@@ -611,7 +611,7 @@ class TrafficGenerator:
                         print('    <vehicle id="RS_LW1_%i" type="standard_car" route="RS_LW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif random_ssf == 16:
                         print('    <vehicle id="LE_RN1_%i" type="standard_car" route="LE_RN1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
-                     if random_ssf == 17:
+                    elif random_ssf == 17:
                         print('    <vehicle id="LE_LN0_%i" type="standard_car" route="LE_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif random_ssf == 18:
                         print('    <vehicle id="LE_UW1_%i" type="standard_car" route="LE_UW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
