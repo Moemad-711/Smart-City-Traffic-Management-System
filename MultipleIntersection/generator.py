@@ -415,7 +415,7 @@ class TrafficGenerator:
 
             for car_counter, step in enumerate(car_gen_steps):
                 route_prop = np.random.uniform()
-                if route_prop < 0.56:  #ssf, s--> straight, f--> final
+                if route_prop < 0.56: # ssf, s--> straight, f--> final
                     random_ssf = np.random.randint(1, 8)
                     if random_ssf == 1:
                         print('    <vehicle id="UW_UE0_%i" type="standard_car" route="UW_UE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
@@ -433,7 +433,7 @@ class TrafficGenerator:
                         print('    <vehicle id="RN_RS0_%i" type="standard_car" route="RN_RS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif random_ssf == 8:
                         print('    <vehicle id="RS_RN0_%i" type="standard_car" route="RS_RN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
-                elif route_prop >= .56 and route_prop < .69:  #tf, t-->turn, f--> final
+                elif route_prop >= .56 and route_prop < .69: # tf, t-->turn, f--> final
                     random_tf = np.random.randint(1, 8)
                     if random_tf == 1:
                         print('    <vehicle id="UW_LN_%i" type="standard_car" route="UW_LN" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
@@ -451,7 +451,7 @@ class TrafficGenerator:
                         print('    <vehicle id="LN_UW_%i" type="standard_car" route="LN_UW" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif random_tf == 8:
                         print('    <vehicle id="RN_UE_%i" type="standard_car" route="RN_UE" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
-                elif route_prop >= .69 and route_prop < .78:#stf, s--> straight, t-->turn, f--> final
+                elif route_prop >= .69 and route_prop < .78: # stf, s--> straight, t-->turn, f--> final
                     random_tsf = np.random.randint(1, 8)
                     if random_tsf == 1:
                         print('    <vehicle id="UW_LS0_%i" type="standard_car" route="UW_LS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
@@ -469,7 +469,7 @@ class TrafficGenerator:
                         print('    <vehicle id="UE_RS0_%i" type="standard_car" route="UE_RS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif random_tsf == 8:
                         print('    <vehicle id="RN_UW0_%i" type="standard_car" route="RN_UW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
-                elif route_prop >= .78 and route_prop < .87:#stf, s--> straight, t-->turn, f--> final
+                elif route_prop >= .78 and route_prop < .87: # stf, s--> straight, t-->turn, f--> final
                     random_stf = np.random.randint(1, 8)
                     if random_stf == 1:
                         print('    <vehicle id="UW_RN0_%i" type="standard_car" route="UW_RN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
@@ -487,7 +487,7 @@ class TrafficGenerator:
                         print('    <vehicle id="UE_LN0_%i" type="standard_car" route="UE_LN0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif random_stf == 8:
                         print('    <vehicle id="RN_LE0_%i" type="standard_car" route="RN_LE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
-                elif route_prop >= .87 and route_prop < .94:# stsf, s--> straight, t-->turn, f--> final
+                elif route_prop >= .87 and route_prop < .94: # stsf, s--> straight, t-->turn, f--> final
                     random_stsf = np.random.randint(1, 8)
                     if random_stsf == 1:
                         print('    <vehicle id="UW_RS0_%i" type="standard_car" route="UW_RS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
@@ -505,7 +505,7 @@ class TrafficGenerator:
                         print('    <vehicle id="UE_LS0_%i" type="standard_car" route="UE_LS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif random_stsf == 8:
                         print('    <vehicle id="RN_LW1_%i" type="standard_car" route="RN_LW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
-                elif route_prop >= .94 and route_prop < .96:# ttf, s--> straight, t-->turn, f--> final
+                elif route_prop >= .94 and route_prop < .96: # ttf, s--> straight, t-->turn, f--> final
                     random_ttf = np.random.randint(1, 8)
                     if random_ttf == 1:
                         print('    <vehicle id="UW_LW0_%i" type="standard_car" route="UW_LW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
@@ -523,7 +523,7 @@ class TrafficGenerator:
                         print('    <vehicle id="RS_LS0_%i" type="standard_car" route="RS_LS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif random_ttf == 8:
                         print('    <vehicle id="LS_RS0_%i" type="standard_car" route="LS_RS0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
-                elif route_prop >= .96 and route_prop < .97:# sttf, s--> straight, t-->turn, f--> final
+                elif route_prop >= .96 and route_prop < .97: # sttf, s--> straight, t-->turn, f--> final
                     random_sttf = np.random.randint(1, 8)
                     if random_sttf == 1:
                         print('    <vehicle id="UW_LE0_%i" type="standard_car" route="UW_LE0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
@@ -541,7 +541,7 @@ class TrafficGenerator:
                         print('    <vehicle id="UE_LW0_%i" type="standard_car" route="UE_LW0" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif random_sttf == 8:
                         print('    <vehicle id="RN_LS1_%i" type="standard_car" route="RN_LS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
-                elif route_prop >= .97 and route_prop < .98:# sttsf, s--> straight, t-->turn, f--> final
+                elif route_prop >= .97 and route_prop < .98: # sttsf, s--> straight, t-->turn, f--> final
                     random_sttsf = np.random.randint(1, 8)
                     if random_sttsf == 1:
                         print('    <vehicle id="UW_LW1_%i" type="standard_car" route="UW_LW1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
@@ -559,7 +559,7 @@ class TrafficGenerator:
                         print('    <vehicle id="RS_LS1_%i" type="standard_car" route="RS_LS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
                     elif random_sttsf == 8:
                         print('    <vehicle id="LS_RS1_%i" type="standard_car" route="LS_RS1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
-                elif route_prop >= .98 and route_prop < .99: #ttsf, t--> straight, t-->turn, f--> final
+                elif route_prop >= .98 and route_prop < .99: # ttsf, t--> straight, t-->turn, f--> final
                     random_ttsf = np.random.randint(1, 8)
                     if random_ttsf == 1:
                         print('    <vehicle id="UW_LE0_%i" type="standard_car" route="UW_LE1" depart="%s" departLane="random" departSpeed="10" />' % (car_counter, step), file=routes)
