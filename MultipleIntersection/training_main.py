@@ -6,7 +6,7 @@ import datetime
 from shutil import copyfile
 from PredictiveModel import PredictiveModel, TestPredictiveModel
 from training_simulation import Simulation
-from multi_generator import TrafficGenerator
+from generator import TrafficGenerator
 from memory import Memory, ST_Memory
 #from model_cnn import TrainModel
 from model import TrainModel
@@ -24,30 +24,54 @@ if __name__ == "__main__":
                         [750, 0, 0, 0, 0],]
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
     path = set_train_path(config['models_path_name'])
+    print('config done')
+
+ 
     
-    Model = TrainModel(
-        config['num_layers'], 
-        config['width_layers'], 
-        config['batch_size'], 
-        config['learning_rate'], 
-        input_dim=config['num_states'], 
-        output_dim=config['num_actions']
-    ) 
+
+    Models={'TL1':TrainModel(config['num_layers'], 
+                             config['width_layers'], 
+                             config['batch_size'], 
+                             config['learning_rate'], 
+                             input_dim=config['num_states'], 
+                             output_dim=config['num_actions']),
+            'TL2':TrainModel(config['num_layers'], 
+                             config['width_layers'], 
+                             config['batch_size'], 
+                             config['learning_rate'], 
+                             input_dim=config['num_states'], 
+                             output_dim=config['num_actions']),
+            'TL3':TrainModel(config['num_layers'], 
+                            config['width_layers'], 
+                            config['batch_size'], 
+                            config['learning_rate'], 
+                            input_dim=config['num_states'], 
+                            output_dim=config['num_actions']),
+            'TL4':TrainModel(config['num_layers'], 
+                            config['width_layers'], 
+                            config['batch_size'], 
+                            config['learning_rate'], 
+                            input_dim=config['num_states'], 
+                            output_dim=config['num_actions'])}
+        
     
-    Models ={'TL1':Model,'TL2':Model
-    ,'TL3':Model,'TL4':Model}
     
     #Create an ST_Model(GNN) Object 
-    st_model=TestPredictiveModel(
-        adjacency_matrix, 
-        os.path.join('st_models', 'model_25'))
+    st_model = None
+    #st_model=TestPredictiveModel(
+    #    adjacency_matrix, 
+    #   os.path.join('st_models', 'model_25'))
         
-    Memory = Memory(
-        config['memory_size_max'], 
-        config['memory_size_min']
-    )
-    Memories ={'TL1':Memory,'TL2':Memory
-    ,'TL3':Memory,'TL4':Memory}
+    print('model done')
+
+    Memories={  'TL1':Memory(config['memory_size_max'], 
+                             config['memory_size_min']),
+                'TL2':Memory(config['memory_size_max'], 
+                             config['memory_size_min']),            
+                'TL3':Memory(config['memory_size_max'], 
+                             config['memory_size_min']),
+                'TL4':Memory(config['memory_size_max'], 
+                             config['memory_size_min'])}
 
     #Create A memory for the ST_Model(GNN)
     st_memory=ST_Memory(
@@ -58,8 +82,7 @@ if __name__ == "__main__":
         config['max_steps'], 
         config['n_cars_generated']
     )
-
-
+    
     Visualization = Visualization(
         path, 
         dpi=96
