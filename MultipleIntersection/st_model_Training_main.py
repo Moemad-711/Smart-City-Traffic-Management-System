@@ -15,15 +15,22 @@ if __name__ == "__main__":
     config = import_st_model_train_configuration(config_file='st_model_training_setting.ini')
     path = set_train_path(config['models_path_name'])
     folder_num = config['traffic_feature_folder_num']
-
-    adjacency_matrix = [[0, 750, 750, 750, 750],
-                        [750, 0, 0, 0, 0],
-                        [750, 0, 0, 0, 0],
-                        [750, 0, 0, 0, 0],
-                        [750, 0, 0, 0, 0],]
+                    ###  UW   LN   TL1  RN   UE   TL2  LE   RS   TL4  LS   LW   TL3 ###
+    adjacency_matrix = [[0,   0,   800, 0,   0,   0,   0,   0,   0,   0,   0,   0],   # UW
+                        [0,   0,   800, 0,   0,   0,   0,   0,   0,   0,   0,   0],   # LN 
+                        [800, 800, 0,   0,   800, 800, 0,   0,   0,   0,   0,   800], # TL1 
+                        [0,   0,   0,   0,   0,   800, 0,   0,   0,   0,   0,   0],   # RN
+                        [0,   0,   0,   0,   0,   800, 0,   0,   0,   0,   0,   0],   # UE 
+                        [0,   0,   800, 800, 800, 0,   0,   0,   800, 0,   0,   0],   # TL2 
+                        [0,   0,   0,   0,   0,   0,   0,   0,   800, 0,   0,   0],   # LE
+                        [0,   0,   0,   0,   0,   0,   0,   0,   800, 0,   0,   0],   # RS
+                        [0,   0,   0,   0,   0,   800, 800, 800, 0,   0,   0,   800], # TL4
+                        [0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   800], # LS
+                        [0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   800], # LW
+                        [0,   0,   800, 0,   0,   0,   0,   0,   800, 800, 800, 0]]   # TL3
     
     model = PredictiveModel(input_shape=(config['batch_size'],4,8), 
-                            adjacency_matrix=adjacency_matrix, 
+                            adjacency_matrix=adjacency_matrix,  
                             batch_size=config['batch_size'], 
                             prediction_steps=config['prediction_steps'])
                         
