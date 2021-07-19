@@ -72,7 +72,7 @@ if __name__ == "__main__":
     #Create A memory for the ST_Model(GNN)
     st_memory=ST_Memory(
         config['st_memory_size'], 
-        (9,1,8))
+        (9,4,8))
 
     TrafficGen = TrafficGenerator(
         config['max_steps'], 
