@@ -1,11 +1,11 @@
 from datetime import time
 from os import path
+from shutil import copyfile
 import timeit
 from traceback import print_tb
 import numpy as np
 import pandas as pd
 import os
-from mpi4py import MPI
 
 from PredictiveModel import PredictiveModel
 from utils import  data_split,import_st_model_train_configuration, set_train_path
@@ -53,6 +53,9 @@ if __name__ == "__main__":
         print('val_shape', x_val.shape)
         print(' training model on features %i...' %(index))
         model.train_model(x_train, y_train, x_val,  y_val,epochs=config['training_epochs'])
+
+    copyfile(src='st_model_training_setting.ini', dst=os.path.join(path, 'st_model_training_setting.ini'))
+
     
     print(' Total Training Time: ', str(timeit.default_timer() - start_time))
     model.save_model(path)
