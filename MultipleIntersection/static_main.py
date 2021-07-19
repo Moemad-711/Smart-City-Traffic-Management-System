@@ -48,7 +48,7 @@ if __name__ == "__main__":
     print("----- End time:", datetime.datetime.now())
     print("----- Session info saved at:", path)
 
-    copyfile(src='training_settings.ini', dst=os.path.join(path, 'training_settings.ini'))
+    copyfile(src='static_settings.ini', dst=os.path.join(path, 'static_settings.ini'))
 
     Visualization.save_data_and_plot(data=Simulation.reward_store, filename='reward', xlabel='Episode', ylabel='Cumulative negative reward')
     Visualization.save_data_and_plot(data=Simulation.cumulative_wait_store, filename='delay', xlabel='Episode', ylabel='Cumulative delay (s)')
