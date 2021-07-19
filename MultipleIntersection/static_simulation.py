@@ -35,6 +35,7 @@ class Simulation:
         self._avg_queue_length_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
         self._current_phase_duration = {'TL1':0, 'TL2':0, 'TL3':0, 'TL4':0}
         self._TL_list = ['TL1','TL2','TL3','TL4']
+        self._action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
 
 
 
@@ -52,15 +53,14 @@ class Simulation:
         # inits
         self._step = 0
         self._waiting_times = {'TL1':{},'TL2':{},'TL3':{},'TL4':{}}
-        self._sum_neg_reward = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
-        self._sum_queue_length = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
-        self._sum_waiting_time = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
-        old_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
-        current_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
-        action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
-        is_phase_green = {'TL1':False, 'TL2':False, 'TL3':False, 'TL4':False}
-        reward = {'TL1':0,'TL2':0,'TL3':0,'TL3':0}
-        old_action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL3':-1}
+        self._sum_neg_reward = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
+        self._sum_queue_length = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
+        self._sum_waiting_time = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
+        old_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
+        current_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
+        is_phase_green = {'TL1':True, 'TL2':True, 'TL3':True, 'TL4':True}
+        reward = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
+        old_action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
 
         while self._step < self._max_steps:
             for TL in self._TL_list:
@@ -68,7 +68,7 @@ class Simulation:
                     if is_phase_green[TL]== True:
                         if self._step != 0:
                             old_total_wait[TL] = current_total_wait[TL]
-                            old_action[TL] = action[TL]
+                            old_action[TL] = self._action[TL]
 
                             # saving only the meaningful reward to better see if the agent is behaving correctly
                             if reward[TL] < 0:
@@ -79,14 +79,19 @@ class Simulation:
                         reward[TL] = old_total_wait[TL] - current_total_wait[TL]
             
                         # choose the light phase to activate, based on the current state of the intersection
-                        action[TL] = self._choose_action(TL)
+                        self._action[TL] = self._choose_action(TL)
                         # if the chosen phase is different from the last phase, activate the yellow phase
-                        self._set_yellow_phase(old_action[TL] , TL)
-                        is_phase_green[TL] = False
-                        self._current_phase_duration[TL] = self._yellow_duration
+                        if self._step != 0:
+                            self._set_yellow_phase(old_action[TL] , TL)
+                            is_phase_green[TL] = False
+                            self._current_phase_duration[TL] = self._yellow_duration
+                        else: 
+                            self._set_green_phase(self._action[TL], TL)
+                            is_phase_green[TL] = True
+                            self._current_phase_duration[TL] = self._green_duration
                     else:
                         # execute the phase selected before
-                        self._set_green_phase(action[TL], TL)
+                        self._set_green_phase(self._action[TL], TL)
                         is_phase_green[TL] = True
                         self._current_phase_duration[TL] = self._green_duration
 
@@ -112,7 +117,7 @@ class Simulation:
         """
         
         incoming_roads ={'TL1':['uw_tl1','tl3_tl1','tl2_tl1','ln_tl1'],
-                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue-tl2'],
+                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue_tl2'],
                          'TL3':['tl4_tl3','tl1_tl3','lw_tl3','ls_tl3'],
                          'TL4':['le_tl4','rs_tl4','tl2_tl4','tl3_tl4']} 
         car_list = traci.vehicle.getIDList()
@@ -130,161 +135,7 @@ class Simulation:
     def _choose_action(self,TL):
         return (self._action[TL]+1)%4
     #Write method to get the Greenlight Time
-    def get_green_duration(self,action): 
-        """
-        Returns The Minimum of current demand and future demand Greenlight Times
-        """
-        #current_demand_green_duration = None
-        #future_demand_green_duration = None
-        green_duration = []
-
-        ##### Get Current Demand Green Duration #####
-        if action == 0:
-            intersection_length = 33.60
-            ### N2TL Duration ###
-            N_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in N_Straight])/3
-            N_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in N_Straight])
-            if N_vehicle_count != 0:
-                N_single_car_time = -N_avg_speed + math.sqrt((N_avg_speed*N_avg_speed) - (4*.5*-intersection_length))
-                green_duration.append(N_single_car_time * N_vehicle_count)
-            
-            ### S2TL Duration ###
-            S_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in S_Straight])/3
-            S_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in S_Straight])
-            if S_vehicle_count != 0:
-                S_single_car_time = -S_avg_speed + math.sqrt((S_avg_speed*S_avg_speed) - (4*.5*-intersection_length))
-                green_duration.append(S_single_car_time * S_vehicle_count)
-
-        elif action == 1:
-            intersection_length = 29.67
-            ### N2TL Duration ###
-            N_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in N_left])
-            N_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in N_left])
-            if N_vehicle_count != 0:
-                N_single_car_time = -N_avg_speed + math.sqrt((N_avg_speed*N_avg_speed) - (4*.5*-intersection_length))
-                green_duration.append(N_single_car_time * N_vehicle_count)
-
-            ### S2TL Duration ###
-            S_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in S_left])
-            S_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in S_left])
-            if S_vehicle_count != 0:    
-                S_single_car_time = -S_avg_speed + math.sqrt((S_avg_speed*S_avg_speed) - (4*.5*-intersection_length))
-                green_duration.append(S_single_car_time * S_vehicle_count)
-
-        elif action == 2:
-            intersection_length = 33.60
-            ### W2TL Duration ###
-            W_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in W_Straight])/3
-            W_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in W_Straight])
-            if W_vehicle_count != 0:
-                W_single_car_time = -W_avg_speed + math.sqrt((W_avg_speed*W_avg_speed) - (4*.5*-intersection_length))
-                green_duration.append(W_single_car_time * W_vehicle_count)
-
-            ### E2TL Duration ###
-            E_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in E_Straight])/3
-            E_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in E_Straight])
-            if E_vehicle_count != 0:
-                E_single_car_time = -E_avg_speed + math.sqrt((E_avg_speed*E_avg_speed) - (4*.5*-intersection_length))
-                green_duration.append(E_single_car_time * E_vehicle_count)
-
-        elif action == 3:
-            intersection_length = 29.67
-            ### W2TL Duration ###
-            W_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in W_left])
-            W_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in W_left])
-            if W_vehicle_count != 0:
-                W_single_car_time = -W_avg_speed + math.sqrt((W_avg_speed*W_avg_speed) - (4*.5*-intersection_length))
-                green_duration.append(W_single_car_time * W_vehicle_count)
-
-            ### E2TL Duration ###
-            E_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in E_left])
-            E_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in E_left])
-            if E_vehicle_count != 0:
-                E_single_car_time = -E_avg_speed+ math.sqrt((E_avg_speed*E_avg_speed) - (4*.5*-intersection_length))
-                green_duration.append(E_single_car_time * E_vehicle_count)
-        ##### End Get Current Demand #####
-
-        ##### Get Future Demand #####
-        
-        st_model_input =  self._st_meomry.get_samples()
-        #print('st_samples: ',st_model_input)
-        #print('st_samples_size: ',len(st_model_input))
-        
-        if len(st_model_input) == 0 :
-            return green_duration
-        #print('     predicting traffic...')
-        st_model_output =  self._st_model.predict_one(st_model_input[:,:,:])
-        future_traffic = pd.DataFrame(st_model_output[0,0,:,:], columns=[ 'east_speed','east_count',
-                                                                        'west_speed','west_count',
-                                                                        'north_speed','north_count',
-                                                                        'south_speed','south_count'])
-        #print('     future_traffic:\n', future_traffic)
-        if action == 0:
-            intersection_length = 33.60
-            #N_single_car_time = intersection_length/future_traffic.iloc[0]['north_speed']
-            N_single_car_time = (-future_traffic.iloc[0]['north_speed'] 
-                                + math.sqrt((future_traffic.iloc[0]['north_speed']*future_traffic.iloc[0]['north_speed']) 
-                                            - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['north_count']  > 0 and not  math.isnan(future_traffic.iloc[0]['north_count']): 
-                green_duration.append(N_single_car_time* future_traffic.iloc[0]['north_count'] * 3/4)
-
-            #S_single_car_time = intersection_length/future_traffic.iloc[0]['south_speed']
-            S_single_car_time = (-future_traffic.iloc[0]['south_speed'] 
-                                + math.sqrt((future_traffic.iloc[0]['south_speed']*future_traffic.iloc[0]['south_speed']) 
-                                            - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['south_count']  > 0 and not  math.isnan(future_traffic.iloc[0]['south_count']):
-                green_duration.append(S_single_car_time* future_traffic.iloc[0]['south_count'] * 3/4)
-
-        elif action == 1:
-            intersection_length = 29.67
-            #N_single_car_time = intersection_length/future_traffic.iloc[0]['north_speed']
-            N_single_car_time = (-future_traffic.iloc[0]['north_speed'] 
-                                + math.sqrt((future_traffic.iloc[0]['north_speed']*future_traffic.iloc[0]['north_speed']) 
-                                            - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['north_count']  > 0 and not  math.isnan(future_traffic.iloc[0]['north_count']): 
-                green_duration.append(N_single_car_time* future_traffic.iloc[0]['north_count'] * 1/4)
-
-            #S_single_car_time = intersection_length/future_traffic.iloc[0]['south_speed']
-            S_single_car_time = (-future_traffic.iloc[0]['south_speed'] 
-                                + math.sqrt((future_traffic.iloc[0]['south_speed']*future_traffic.iloc[0]['south_speed']) 
-                                            - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['south_count']  > 0 and not math.isnan(future_traffic.iloc[0]['south_count']):
-                green_duration.append(S_single_car_time* future_traffic.iloc[0]['south_count'] * 1/4)
-
-        elif action == 2:
-            intersection_length = 33.60
-            #W_single_car_time = intersection_length/future_traffic.iloc[0]['west_speed']
-            W_single_car_time = (-future_traffic.iloc[0]['west_speed'] 
-                                + math.sqrt((future_traffic.iloc[0]['west_speed']*future_traffic.iloc[0]['west_speed']) 
-                                            - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['west_count']  > 0 and not math.isnan(future_traffic.iloc[0]['west_count']):
-                green_duration.append(W_single_car_time* future_traffic.iloc[0]['west_count'] * 3/4)
-
-            #E_single_car_time = intersection_length/future_traffic.iloc[0]['east_speed']
-            E_single_car_time = (-future_traffic.iloc[0]['east_speed'] 
-                                + math.sqrt((future_traffic.iloc[0]['east_speed']*future_traffic.iloc[0]['east_speed']) 
-                                            - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['east_count']  > 0 and not math.isnan(future_traffic.iloc[0]['east_count']):    
-                green_duration.append(E_single_car_time* future_traffic.iloc[0]['east_count'] * 3/4)
-
-        elif action == 3:
-            intersection_length = 29.67
-            #W_single_car_time = intersection_length/future_traffic.iloc[0]['west_speed']
-            W_single_car_time = (-future_traffic.iloc[0]['west_speed'] 
-                                + math.sqrt((future_traffic.iloc[0]['west_speed']*future_traffic.iloc[0]['west_speed']) 
-                                            - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['west_count']  > 0 and not math.isnan(future_traffic.iloc[0]['west_count']):    
-                green_duration.append(W_single_car_time* math.ceil(future_traffic.iloc[0]['west_count']) * 1/4)
-
-            #E_single_car_time = intersection_length/future_traffic.iloc[0]['east_speed']
-            E_single_car_time = (-future_traffic.iloc[0]['east_speed'] 
-                                + math.sqrt((future_traffic.iloc[0]['east_speed']*future_traffic.iloc[0]['east_speed']) 
-                                            - (4*.5*-intersection_length)))
-            if future_traffic.iloc[0]['east_count']  > 0 and not math.isnan(future_traffic.iloc[0]['east_count']):     
-                green_duration.append(E_single_car_time* math.ceil(future_traffic.iloc[0]['east_count']) * 1/4)
-        #print('     green_duration:', green_duration)
-        return green_duration
-
+    
     def _set_yellow_phase(self, old_action,TL):
         """
         Activate the correct yellow light combination in sumo
@@ -310,7 +161,7 @@ class Simulation:
         Retrieve the number of cars with speed = 0 in every incoming lane
         """
         incoming_roads ={'TL1':['uw_tl1','tl3_tl1','tl2_tl1','ln_tl1'],
-                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue-tl2'],
+                         'TL2':['rn_tl2','tl1_tl2','tl4_tl2','ue_tl2'],
                          'TL3':['tl4_tl3','tl1_tl3','lw_tl3','ls_tl3'],
                          'TL4':['le_tl4','rs_tl4','tl2_tl4','tl3_tl4']} 
         result=incoming_roads[TL]
