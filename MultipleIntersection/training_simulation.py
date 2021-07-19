@@ -162,7 +162,13 @@ class Simulation:
         #print(' - Step:', self._step)
         traci.simulationStep()  # simulate 1 step in sumo
 
-        # saving traffic features to st_memory                
+        ### saving traffic features to st_memory ###
+
+        #sample_dict = pd.DataFrame(columns=['east_speed','east_count',
+        #                                    'west_speed','west_count',
+        #                                    'north_speed','north_count',
+        #                                    'south_speed','south_count'])
+                        
         #north_speed = traci.edge.getLastStepMeanSpeed('N2TL')
         #north_count = traci.edge.getLastStepVehicleNumber('N2TL')
 
@@ -175,18 +181,16 @@ class Simulation:
         #east_speed = traci.edge.getLastStepMeanSpeed('E2TL')
         #east_count = traci.edge.getLastStepVehicleNumber('E2TL')
         
-        #sample_dict = pd.DataFrame(columns=['east_speed','east_count',
-        #                                    'west_speed','west_count',
-        #                                    'north_speed','north_count',
-        #                                    'south_speed','south_count'])
+        
         #sample_dict = sample_dict.append({'east_speed': west_speed,'east_count': east_count,
         #                                    'west_speed': east_speed,'west_count': west_count,
         #                                    'north_speed': north_speed,'north_count': north_count,
         #                                    'south_speed': south_speed,'south_count': south_count},
         #                                    ignore_index=True)                                                
         
-        #sample = sample_dict.to_numpy()
-        #self._st_meomry.add_sample(sample)
+        sample = None  #node * features(4*8) as numpy array
+        
+        self._st_meomry.add_sample(sample)
 
         self._step += 1 # update the step counter
         for TL in self._TL_list:
