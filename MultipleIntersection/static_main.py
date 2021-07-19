@@ -7,14 +7,14 @@ from shutil import copyfile
 from static_simulation import Simulation
 from generator import TrafficGenerator
 from visualization import Visualization
-from utils import import_train_configuration, set_sumo, set_train_path
+from utils import import_static_configuration, import_train_configuration, set_static_path, set_sumo, set_train_path
 
 
 if __name__ == "__main__":
 
-    config = import_train_configuration(config_file='training_settings.ini')
+    config = import_static_configuration(config_file='static_settings.ini')
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
-    path = set_train_path(config['models_path_name'])
+    path = set_static_path(config['path_name'])
     print('config done')
 
     TrafficGen = TrafficGenerator(
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     print("----- End time:", datetime.datetime.now())
     print("----- Session info saved at:", path)
 
-    copyfile(src='training_settings.ini', dst=os.path.join(path, 'training_settings.ini'))
+    copyfile(src='static_settings.ini', dst=os.path.join(path, 'static_settings.ini'))
 
     Visualization.save_data_and_plot(data=Simulation.reward_store, filename='reward', xlabel='Episode', ylabel='Cumulative negative reward')
     Visualization.save_data_and_plot(data=Simulation.cumulative_wait_store, filename='delay', xlabel='Episode', ylabel='Cumulative delay (s)')
