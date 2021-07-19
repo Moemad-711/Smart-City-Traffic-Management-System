@@ -160,37 +160,49 @@ class Simulation:
         #5400 if todo = 5 and step = 5397 --> 5402 --> todo = 3 
         
         #print(' - Step:', self._step)
-        traci.simulationStep()  # simulate 1 step in sumo
+        #traci.simulationStep()  # simulate 1 step in sumo
 
         ### saving traffic features to st_memory ###
-
-        #sample_dict = pd.DataFrame(columns=['east_speed','east_count',
-        #                                    'west_speed','west_count',
-        #                                    'north_speed','north_count',
-        #                                    'south_speed','south_count'])
-                        
-        #north_speed = traci.edge.getLastStepMeanSpeed('N2TL')
-        #north_count = traci.edge.getLastStepVehicleNumber('N2TL')
-
-        #south_speed = traci.edge.getLastStepMeanSpeed('S2TL')
-        #south_count = traci.edge.getLastStepVehicleNumber('S2TL')
-
-        #west_speed = traci.edge.getLastStepMeanSpeed('W2TL')
-        #west_count = traci.edge.getLastStepVehicleNumber('W2TL')
-
-        #east_speed = traci.edge.getLastStepMeanSpeed('E2TL')
-        #east_count = traci.edge.getLastStepVehicleNumber('E2TL')
+        TL_Nodes = ['tl1','tl2','tl3','tl4']
+        nodes = {'tl1':{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0},
+                'tl2' :{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0},
+                'tl3' :{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0},
+                'tl4' :{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0}
+                }
+        edges_direction={    'west':['uw_tl1','tl1_tl2','lw_tl3','tl3_tl4'],
+                             'east':['tl2_tl1','ue_tl2','tl4_tl3','le_tl4'],
+                             'south':['tl3_tl1','tl4_tl2','ls_tl3','rs_tl4'],
+                             'north':['ln_tl1','rn_tl2','tl1_tl3','tl2_tl4'] }                                           
+        traci.simulationStep()
+        edge_list = traci.edge.getIDList()
+        for edge in edge_list:
+            node = str(edge).split('_')[1]
+            if node in TL_Nodes:
+                vehicle_count = traci.edge.getLastStepVehicleNumber(edge)
+                if vehicle_count == 0: avg_speed = 0
+                else: avg_speed = traci.edge.getLastStepMeanSpeed(edge)
+                if edge in edges_direction['west']:
+                    nodes[node]['west_speed'] = avg_speed
+                    nodes[node]['west_count'] = vehicle_count
+                if edge in edges_direction['east']:
+                    nodes[node]['east_speed'] = avg_speed
+                    nodes[node]['east_count'] = vehicle_count
+                if edge in edges_direction['south']:
+                    nodes[node]['south_speed'] = avg_speed
+                    nodes[node]['south_count'] = vehicle_count
+                if edge in edges_direction['north']:
+                    nodes[node]['north_speed'] = avg_speed
+                    nodes[node]['north_count'] = vehicle_count
         
-        
-        #sample_dict = sample_dict.append({'east_speed': west_speed,'east_count': east_count,
-        #                                    'west_speed': east_speed,'west_count': west_count,
-        #                                    'north_speed': north_speed,'north_count': north_count,
-        #                                    'south_speed': south_speed,'south_count': south_count},
-        #                                    ignore_index=True)                                                
-        
-        sample = None  #node * features(4*8) as numpy array
-        
-        self._st_meomry.add_sample(sample)
+        for tl in TL_Nodes:      
+            current_data = [nodes[tl]['east_speed'],nodes[tl]['east_count'],
+                            nodes[tl]['west_speed'],nodes[tl]['west_count'],
+                            nodes[tl]['north_speed'],nodes[tl]['north_count'],
+                            nodes[tl]['south_speed'],nodes[tl]['south_count']]
+            sample = current_data.to_numpy()
+            self._st_meomry.add_sample(sample)
+        #sample = sample_dict.to_numpy()
+        #self._st_meomry.add_sample(sample)
 
         self._step += 1 # update the step counter
         for TL in self._TL_list:
