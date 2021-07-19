@@ -143,7 +143,7 @@ class Simulation:
         
         traci.close()
         simulation_time = round(timeit.default_timer() - start_time, 1)
-        MultipleIntersection_df  = pd.DataFrame(allDataList,columns=columnsNames)
+        MultipleIntersection_df  = pd.DataFrame(allDataList,columns=columnsNames ,index=False)
         MultipleIntersection_df.to_csv(file_name)
         
         return simulation_time
