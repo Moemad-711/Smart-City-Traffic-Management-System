@@ -99,12 +99,14 @@ class Simulation:
         current_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
         old_state = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
         old_action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
-        action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
+        action = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
         is_phase_green = {'TL1':True, 'TL2':True, 'TL3':True, 'TL4':True}
+        self._current_phase_duration = {'TL1':0, 'TL2':0, 'TL3':0, 'TL4':0}
         reward = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
         current_state = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
 
         while self._step < self._max_steps:
+            #print('step:', self._step)
             for TL in self._TL_list:
                 if self._current_phase_duration[TL] ==0:
                     if is_phase_green[TL]== True:
@@ -132,7 +134,10 @@ class Simulation:
 
                         # choose the light phase to activate, based on the current state of the intersection
                         action[TL] = self._choose_action(current_state[TL], epsilon,TL)
-
+                        
+                        #print('action: ', action)
+                        #print('old_action: ', old_action)
+                        
                         # if the chosen phase is different from the last phase, activate the yellow phase
                         if self._step !=0 and old_action[TL] != action[TL]:
                             self._set_yellow_phase(old_action[TL] , TL)
