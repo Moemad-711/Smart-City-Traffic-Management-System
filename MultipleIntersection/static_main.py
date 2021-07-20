@@ -49,8 +49,11 @@ if __name__ == "__main__":
     print("----- Session info saved at:", path)
 
     copyfile(src='static_settings.ini', dst=os.path.join(path, 'static_settings.ini'))
+    for TL in Simulation._TL_list:
+        Visualization.save_data_and_plot(data=Simulation.reward_store[TL], filename='reward_%s' %(TL), xlabel='Episode', ylabel='Cumulative negative reward')
+        Visualization.save_data_and_plot(data=Simulation.cumulative_wait_store[TL], filename='delay_%s' %(TL), xlabel='Episode', ylabel='Cumulative delay (s)')
+        Visualization.save_data_and_plot(data=Simulation.avg_queue_length_store[TL], filename='queue_%s' %(TL), xlabel='Episode', ylabel='Average queue length (vehicles)')
 
-    Visualization.save_data_and_plot(data=Simulation.reward_store, filename='reward', xlabel='Episode', ylabel='Cumulative negative reward')
-    Visualization.save_data_and_plot(data=Simulation.cumulative_wait_store, filename='delay', xlabel='Episode', ylabel='Cumulative delay (s)')
-    Visualization.save_data_and_plot(data=Simulation.avg_queue_length_store, filename='queue', xlabel='Episode', ylabel='Average queue length (vehicles)')
+    Visualization.save_data_and_plot(data=Simulation.cumulative_wait_store['all'], filename='delay_all', xlabel='Episode', ylabel='Cumulative delay (s)')
+    Visualization.save_data_and_plot(data=Simulation.avg_queue_length_store['all'], filename='queue_all', xlabel='Episode', ylabel='Average queue length (vehicles)')
     
