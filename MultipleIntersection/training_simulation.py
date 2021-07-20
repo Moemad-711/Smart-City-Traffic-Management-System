@@ -21,14 +21,38 @@ PHASE_EWL_GREEN = 6  # action 3 code 11
 PHASE_EWL_YELLOW = 7
 
 # Lanes List
-N_Straight = ['N2TL_0', 'N2TL_1', 'N2TL_2']
-N_left = ['N2TL_3']
-S_Straight = ['S2TL_0', 'S2TL_1', 'S2TL_2']
-S_left = ['S2TL_3']
-W_Straight = ['W2TL_0', 'W2TL_1', 'W2TL_2']
-W_left = ['W2TL_3']
-E_Straight = ['E2TL_0', 'E2TL_1', 'E2TL_2']
-E_left = ['E2TL_3']
+N_Straight={'TL1':['ln_tl1_0', 'ln_tl1_1', 'ln_tl1_2'],
+            'TL2':['rn_tl2_0', 'rn_tl2_1', 'rn_tl2_2'],
+            'TL3':['tl1_tl3_0', 'tl1_tl3_1', 'tl1_tl3_2'],
+            'TL4':['tl2_tl4_0', 'tl2_tl4_1', 'tl2_tl4_2']}
+N_left={'TL1':['ln_tl1_3'],
+        'TL2':['rn_tl2_3'],
+        'TL3':['tl1_tl3_3'],
+        'TL4':['tl2_tl4_3']}
+S_Straight={'TL1':['tl3_tl1_0', 'tl3_tl1_1', 'tl3_tl1_2'],
+            'TL2':['tl4_tl2_0', 'tl4_tl2_1', 'tl4_tl2_2'],
+            'TL3':['ls_tl3_0', 'ls_tl3_1', 'ls_tl3_2'],
+            'TL4':['rs_tl4_0', 'rs_tl4_1', 'rs_tl4_2']}
+S_left={'TL1':['tl3_tl1_3'],
+        'TL2':['tl4_tl2_3'],
+        'TL3':['ls_tl3_3'],
+        'TL4':['rs_tl4_3']}
+W_Straight={'TL1':['uw_tl1_0', 'uw_tl1_1', 'uw_tl1_2'],
+            'TL2':['tl1_tl2_0', 'tl1_tl2_1', 'tl1_tl2_2'],
+            'TL3':['lw_tl3_0', 'lw_tl3_1', 'lw_tl3_2'],
+            'TL4':['tl3_tl4_0', 'tl3_tl4_1', 'tl3_tl4_2']} 
+W_left={'TL1':['uw_tl1_3'],
+        'TL2':['tl1_tl2_3'],
+        'TL3':['lw_tl3_3'],
+        'TL4':['tl3_tl4_3']}
+E_Straight={'TL1':['tl2_tl1_0', 'tl2_tl1_1', 'tl2_tl1_2'],
+            'TL2':['ue_tl2_0', 'ue_tl2_1', 'ue_tl2_2'],
+            'TL3':['tl4_tl3_0', 'tl4_tl3_1', 'tl4_tl3_2'],
+            'TL4':['le_tl4_0', 'le_tl4_1', 'le_tl4_2']} 
+E_left={'TL1':['tl2_tl1_3'],
+        'TL2':['ue_tl2_3'],
+        'TL3':['tl4_tl3_3'],
+        'TL4':['le_tl4_3']}
 
 class Simulation:
     def __init__(self, Models,st_model,Memories, st_meomry,TrafficGen, sumo_cmd, gamma, max_steps, green_duration, yellow_duration, num_states, num_actions, training_epochs):
@@ -46,8 +70,8 @@ class Simulation:
         self._num_states = num_states
         self._num_actions = num_actions
         self._reward_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
-        self._cumulative_wait_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
-        self._avg_queue_length_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
+        self._cumulative_wait_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[], 'all':[]}
+        self._avg_queue_length_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[], 'all':[]}
         self._training_epochs = training_epochs
         self._current_phase_duration = {'TL1':0, 'TL2':0, 'TL3':0, 'TL4':0}
         self._TL_list = ['TL1','TL2','TL3','TL4']
@@ -117,26 +141,26 @@ class Simulation:
                         else:
                             self._set_green_phase(action[TL], TL)
                             is_phase_green[TL] = True
-                            self._current_phase_duration[TL] = self._green_duration
+                            greenlight_durations= self._get_green_duration(action[TL], TL)
+                            greenlight_durations =[x for x in greenlight_durations if x>0 and x<= self._green_duration]
+                            if len(greenlight_durations) > 0:
+                                greenlight_duration = math.ceil(min(greenlight_durations))
+                                self._current_phase_duration[TL] = greenlight_duration
+                            else:
+                                self._current_phase_duration[TL] = self._green_duration
                     else:
                         # execute the phase selected before
                         self._set_green_phase(action[TL], TL)
                         is_phase_green[TL] = True
-                        self._current_phase_duration[TL] = self._green_duration
+                        greenlight_durations= self._get_green_duration(action[TL], TL)
+                        greenlight_durations =[x for x in greenlight_durations if x>0 and x<= self._green_duration]
+                        if len(greenlight_durations) > 0:
+                            greenlight_duration = math.ceil(min(greenlight_durations))
+                            self._current_phase_duration[TL] = greenlight_duration
+                        else:
+                            self._current_phase_duration[TL] = self._green_duration
 
             self._simulate()
-            #Call Method to Evaluate Greenlight Time
-            #greenlight_durations = self.get_green_duration(action=action)
-            #greenlight_durations =[x for x in greenlight_durations if x>0 and x<= 30]
-            #print('greenlight_durations: ', greenlight_durations)
-            #if len(greenlight_durations) > 0:
-            #    greenlight_duration = math.ceil(min(greenlight_durations))
-            #    print(' green_duration: ',greenlight_duration )
-            #    self._simulate(greenlight_duration)
-            #else:
-            #    self._simulate(self._green_duration)
-            
-            #self._simulate(self._green_duration)
 
         self._save_episode_stats()
         print("Total reward:", self._sum_neg_reward, "- Epsilon:", round(epsilon, 2))
@@ -165,42 +189,54 @@ class Simulation:
         ### saving traffic features to st_memory ###
         TL_Nodes = ['tl1','tl2','tl3','tl4']
         nodes = {'tl1':{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0},
-                'tl2' :{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0},
-                'tl3' :{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0},
-                'tl4' :{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0}
+                 'tl2' :{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0},
+                 'tl3' :{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0},
+                 'tl4' :{'east_speed':0,'east_count':0,'west_speed':0,'west_count':0,'north_speed':0,'north_count':0,'south_speed':0,'south_count':0}
                 }
-        edges_direction={    'west':['uw_tl1','tl1_tl2','lw_tl3','tl3_tl4'],
-                             'east':['tl2_tl1','ue_tl2','tl4_tl3','le_tl4'],
-                             'south':['tl3_tl1','tl4_tl2','ls_tl3','rs_tl4'],
-                             'north':['ln_tl1','rn_tl2','tl1_tl3','tl2_tl4'] }                                           
+        edges_direction={'west':['uw_tl1','tl1_tl2','lw_tl3','tl3_tl4'],
+                         'east':['tl2_tl1','ue_tl2','tl4_tl3','le_tl4'],
+                         'south':['tl3_tl1','tl4_tl2','ls_tl3','rs_tl4'],
+                         'north':['ln_tl1','rn_tl2','tl1_tl3','tl2_tl4']}
+        current_node_features = pd.DataFrame(columns=['east_speed','east_count',
+                                                      'west_speed','west_count',
+                                                      'north_speed','north_count',
+                                                      'south_speed','south_count'])                                           
         traci.simulationStep()
         edge_list = traci.edge.getIDList()
         for edge in edge_list:
             node = str(edge).split('_')[1]
             if node in TL_Nodes:
                 vehicle_count = traci.edge.getLastStepVehicleNumber(edge)
-                if vehicle_count == 0: avg_speed = 0
-                else: avg_speed = traci.edge.getLastStepMeanSpeed(edge)
+                if vehicle_count == 0: 
+                    avg_speed = 0
+                else: 
+                    avg_speed = traci.edge.getLastStepMeanSpeed(edge)
+
                 if edge in edges_direction['west']:
                     nodes[node]['west_speed'] = avg_speed
                     nodes[node]['west_count'] = vehicle_count
-                if edge in edges_direction['east']:
+
+                elif edge in edges_direction['east']:
                     nodes[node]['east_speed'] = avg_speed
                     nodes[node]['east_count'] = vehicle_count
-                if edge in edges_direction['south']:
+
+                elif edge in edges_direction['south']:
                     nodes[node]['south_speed'] = avg_speed
                     nodes[node]['south_count'] = vehicle_count
-                if edge in edges_direction['north']:
+
+                elif edge in edges_direction['north']:
                     nodes[node]['north_speed'] = avg_speed
                     nodes[node]['north_count'] = vehicle_count
         
         for tl in TL_Nodes:      
-            current_data = [nodes[tl]['east_speed'],nodes[tl]['east_count'],
-                            nodes[tl]['west_speed'],nodes[tl]['west_count'],
-                            nodes[tl]['north_speed'],nodes[tl]['north_count'],
-                            nodes[tl]['south_speed'],nodes[tl]['south_count']]
-            sample = current_data.to_numpy()
-            self._st_meomry.add_sample(sample)
+            current_node_features = current_node_features.append({'east_speed': nodes[tl]['east_speed'],'east_count':nodes[tl]['east_count'],
+                                                                  'west_speed': nodes[tl]['west_speed'],'west_count':nodes[tl]['west_count'],
+                                                                  'north_speed': nodes[tl]['north_speed'],'north_count':nodes[tl]['north_count'],
+                                                                  'south_speed':nodes[tl]['south_speed'],'south_count':nodes[tl]['south_count']}, ignore_index=True)
+                
+        sample = current_node_features.to_numpy()
+        #print(sample)
+        self._st_meomry.add_sample(sample)
         #sample = sample_dict.to_numpy()
         #self._st_meomry.add_sample(sample)
 
@@ -249,7 +285,7 @@ class Simulation:
             return np.argmax(self._Models[TL].predict_one(state)) # the best action given the current state
 
     #Write method to get the Greenlight Time
-    def get_green_duration(self,action,TL): 
+    def _get_green_duration(self,action,TL): 
         """
         Returns The Minimum of current demand and future demand Greenlight Times
         """
@@ -261,15 +297,15 @@ class Simulation:
         if action == 0:
             intersection_length = 33.60
             ### N2TL Duration ###
-            N_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in N_Straight])/3
-            N_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in N_Straight])
+            N_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in N_Straight[TL]])/3
+            N_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in N_Straight[TL]])
             if N_vehicle_count != 0:
                 N_single_car_time = -N_avg_speed + math.sqrt((N_avg_speed*N_avg_speed) - (4*.5*-intersection_length))
                 green_duration.append(N_single_car_time * N_vehicle_count)
             
             ### S2TL Duration ###
-            S_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in S_Straight])/3
-            S_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in S_Straight])
+            S_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in S_Straight[TL]])/3
+            S_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in S_Straight[TL]])
             if S_vehicle_count != 0:
                 S_single_car_time = -S_avg_speed + math.sqrt((S_avg_speed*S_avg_speed) - (4*.5*-intersection_length))
                 green_duration.append(S_single_car_time * S_vehicle_count)
@@ -277,15 +313,15 @@ class Simulation:
         elif action == 1:
             intersection_length = 29.67
             ### N2TL Duration ###
-            N_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in N_left])
-            N_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in N_left])
+            N_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in N_left[TL]])
+            N_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in N_left[TL]])
             if N_vehicle_count != 0:
                 N_single_car_time = -N_avg_speed + math.sqrt((N_avg_speed*N_avg_speed) - (4*.5*-intersection_length))
                 green_duration.append(N_single_car_time * N_vehicle_count)
 
             ### S2TL Duration ###
-            S_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in S_left])
-            S_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in S_left])
+            S_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in S_left[TL]])
+            S_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in S_left[TL]])
             if S_vehicle_count != 0:    
                 S_single_car_time = -S_avg_speed + math.sqrt((S_avg_speed*S_avg_speed) - (4*.5*-intersection_length))
                 green_duration.append(S_single_car_time * S_vehicle_count)
@@ -293,15 +329,15 @@ class Simulation:
         elif action == 2:
             intersection_length = 33.60
             ### W2TL Duration ###
-            W_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in W_Straight])/3
-            W_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in W_Straight])
+            W_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in W_Straight[TL]])/3
+            W_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in W_Straight[TL]])
             if W_vehicle_count != 0:
                 W_single_car_time = -W_avg_speed + math.sqrt((W_avg_speed*W_avg_speed) - (4*.5*-intersection_length))
                 green_duration.append(W_single_car_time * W_vehicle_count)
 
             ### E2TL Duration ###
-            E_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in E_Straight])/3
-            E_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in E_Straight])
+            E_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in E_Straight[TL]])/3
+            E_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in E_Straight[TL]])
             if E_vehicle_count != 0:
                 E_single_car_time = -E_avg_speed + math.sqrt((E_avg_speed*E_avg_speed) - (4*.5*-intersection_length))
                 green_duration.append(E_single_car_time * E_vehicle_count)
@@ -309,15 +345,15 @@ class Simulation:
         elif action == 3:
             intersection_length = 29.67
             ### W2TL Duration ###
-            W_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in W_left])
-            W_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in W_left])
+            W_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in W_left[TL]])
+            W_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in W_left[TL]])
             if W_vehicle_count != 0:
                 W_single_car_time = -W_avg_speed + math.sqrt((W_avg_speed*W_avg_speed) - (4*.5*-intersection_length))
                 green_duration.append(W_single_car_time * W_vehicle_count)
 
             ### E2TL Duration ###
-            E_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in E_left])
-            E_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in E_left])
+            E_avg_speed = sum([traci.lane.getLastStepMeanSpeed(lane) for lane in E_left[TL]])
+            E_vehicle_count = sum([traci.lane.getLastStepVehicleNumber(lane) for lane in E_left[TL]])
             if E_vehicle_count != 0:
                 E_single_car_time = -E_avg_speed+ math.sqrt((E_avg_speed*E_avg_speed) - (4*.5*-intersection_length))
                 green_duration.append(E_single_car_time * E_vehicle_count)
@@ -330,6 +366,7 @@ class Simulation:
         #print('st_samples_size: ',len(st_model_input))
         
         tl_loc = {'TL1':0, 'TL2':1, 'TL3':2,'TL4':3}
+        
         if len(st_model_input) == 0 :
             return green_duration
         #print('     predicting traffic...')
@@ -566,9 +603,11 @@ class Simulation:
         Save the stats of the episode to plot the graphs at the end of the session
         """
         for TL in self._TL_list:
-            self._reward_store.append(self._sum_neg_reward[TL])  # how much negative reward in this episode
-            self._cumulative_wait_store.append(self._sum_waiting_time[TL])  # total number of seconds waited by cars in this episode
-            self._avg_queue_length_store.append(self._sum_queue_length[TL] / self._max_steps)  # average number of queued cars per step, in this episode
+            self._reward_store[TL].append(self._sum_neg_reward[TL])  # how much negative reward in this episode
+            self._cumulative_wait_store[TL].append(self._sum_waiting_time[TL])  # total number of seconds waited by cars in this episode
+            self._avg_queue_length_store[TL].append(self._sum_queue_length[TL] / self._max_steps)  # average number of queued cars per step, in this episode
+            self._cumulative_wait_store['all'].append(self._sum_waiting_time[TL])
+            self._avg_queue_length_store['all'].append(self._sum_queue_length[TL] / self._max_steps)
 
 
     @property

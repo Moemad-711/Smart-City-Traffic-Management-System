@@ -17,11 +17,19 @@ from utils import import_train_configuration, set_sumo, set_train_path
 if __name__ == "__main__":
 
     config = import_train_configuration(config_file='training_settings.ini')
-    adjacency_matrix = [[0, 750, 750, 750, 750],
-                        [750, 0, 0, 0, 0],
-                        [750, 0, 0, 0, 0],
-                        [750, 0, 0, 0, 0],
-                        [750, 0, 0, 0, 0],]
+                    ###  UW   LN   TL1  RN   UE   TL2  LE   RS   TL4  LS   LW   TL3 ###
+    adjacency_matrix = [[0,   0,   800, 0,   0,   0,   0,   0,   0,   0,   0,   0],   # UW
+                        [0,   0,   800, 0,   0,   0,   0,   0,   0,   0,   0,   0],   # LN 
+                        [800, 800, 0,   0,   800, 800, 0,   0,   0,   0,   0,   800], # TL1 
+                        [0,   0,   0,   0,   0,   800, 0,   0,   0,   0,   0,   0],   # RN
+                        [0,   0,   0,   0,   0,   800, 0,   0,   0,   0,   0,   0],   # UE 
+                        [0,   0,   800, 800, 800, 0,   0,   0,   800, 0,   0,   0],   # TL2 
+                        [0,   0,   0,   0,   0,   0,   0,   0,   800, 0,   0,   0],   # LE
+                        [0,   0,   0,   0,   0,   0,   0,   0,   800, 0,   0,   0],   # RS
+                        [0,   0,   0,   0,   0,   800, 800, 800, 0,   0,   0,   800], # TL4
+                        [0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   800], # LS
+                        [0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   800], # LW
+                        [0,   0,   800, 0,   0,   0,   0,   0,   800, 800, 800, 0]]   # TL3
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
     path = set_train_path(config['models_path_name'])
 
@@ -53,10 +61,10 @@ if __name__ == "__main__":
     
     
     #Create an ST_Model(GNN) Object 
-    st_model = None
-    #st_model=TestPredictiveModel(
-    #    adjacency_matrix, 
-    #   os.path.join('st_models', 'model_25'))
+    st_model = TestPredictiveModel(
+        adjacency_matrix, 
+        os.path.join('st_models', 'model_2'))
+   
         
     print('model done')
 
@@ -70,9 +78,7 @@ if __name__ == "__main__":
                              config['memory_size_min'])}
 
     #Create A memory for the ST_Model(GNN)
-    st_memory=ST_Memory(
-        config['st_memory_size'], 
-        (9,4,8))
+    st_memory=ST_Memory((5,4,8))
 
     TrafficGen = TrafficGenerator(
         config['max_steps'], 
@@ -116,12 +122,15 @@ if __name__ == "__main__":
     print("----- End time:", datetime.datetime.now())
     print("----- Session info saved at:", path)
 
-    for TL in Simulation._TL_list:
-        Models[TL].save_model(path, TL)
-
     copyfile(src='training_settings.ini', dst=os.path.join(path, 'training_settings.ini'))
 
-    Visualization.save_data_and_plot(data=Simulation.reward_store, filename='reward', xlabel='Episode', ylabel='Cumulative negative reward')
-    Visualization.save_data_and_plot(data=Simulation.cumulative_wait_store, filename='delay', xlabel='Episode', ylabel='Cumulative delay (s)')
-    Visualization.save_data_and_plot(data=Simulation.avg_queue_length_store, filename='queue', xlabel='Episode', ylabel='Average queue length (vehicles)')
+    for TL in Simulation._TL_list:
+        Models[TL].save_model(path, TL)
+        Visualization.save_data_and_plot(data=Simulation.reward_store[TL], filename='reward_%s' %(TL), xlabel='Episode', ylabel='Cumulative negative reward')
+        Visualization.save_data_and_plot(data=Simulation.cumulative_wait_store[TL], filename='delay_%s' %(TL), xlabel='Episode', ylabel='Cumulative delay (s)')
+        Visualization.save_data_and_plot(data=Simulation.avg_queue_length_store[TL], filename='queue_%s' %(TL), xlabel='Episode', ylabel='Average queue length (vehicles)')
+
+    Visualization.save_data_and_plot(data=Simulation.cumulative_wait_store['all'], filename='delay_all', xlabel='Episode', ylabel='Cumulative delay (s)')
+    Visualization.save_data_and_plot(data=Simulation.avg_queue_length_store['all'], filename='queue_all', xlabel='Episode', ylabel='Average queue length (vehicles)')
     
+        

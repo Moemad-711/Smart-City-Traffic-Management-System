@@ -37,6 +37,8 @@ if __name__ == "__main__":
     start_time = timeit.default_timer()
     total_episodes = 99
 
+    copyfile(src='st_model_training_setting.ini', dst=os.path.join(path, 'st_model_training_setting.ini'))
+
     for index in range(total_episodes):
         ### Reading Traffic information ###
         print('----- Reading From traffic features %i -----' % (index)) 
@@ -54,11 +56,10 @@ if __name__ == "__main__":
         print(' training model on features %i...' %(index))
         model.train_model(x_train, y_train, x_val,  y_val,epochs=config['training_epochs'])
 
-    copyfile(src='st_model_training_setting.ini', dst=os.path.join(path, 'st_model_training_setting.ini'))
-
     
     print(' Total Training Time: ', str(timeit.default_timer() - start_time))
     model.save_model(path)
+    print('Data Saved at: ', path)
 
 
 
