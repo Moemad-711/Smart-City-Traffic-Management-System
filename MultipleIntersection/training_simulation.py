@@ -70,8 +70,8 @@ class Simulation:
         self._num_states = num_states
         self._num_actions = num_actions
         self._reward_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
-        self._cumulative_wait_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
-        self._avg_queue_length_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
+        self._cumulative_wait_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[], 'all':[]}
+        self._avg_queue_length_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[], 'all':[]}
         self._training_epochs = training_epochs
         self._current_phase_duration = {'TL1':0, 'TL2':0, 'TL3':0, 'TL4':0}
         self._TL_list = ['TL1','TL2','TL3','TL4']
@@ -603,9 +603,11 @@ class Simulation:
         Save the stats of the episode to plot the graphs at the end of the session
         """
         for TL in self._TL_list:
-            self._reward_store.append(self._sum_neg_reward[TL])  # how much negative reward in this episode
-            self._cumulative_wait_store.append(self._sum_waiting_time[TL])  # total number of seconds waited by cars in this episode
-            self._avg_queue_length_store.append(self._sum_queue_length[TL] / self._max_steps)  # average number of queued cars per step, in this episode
+            self._reward_store[TL].append(self._sum_neg_reward[TL])  # how much negative reward in this episode
+            self._cumulative_wait_store[TL].append(self._sum_waiting_time[TL])  # total number of seconds waited by cars in this episode
+            self._avg_queue_length_store[TL].append(self._sum_queue_length[TL] / self._max_steps)  # average number of queued cars per step, in this episode
+            self._cumulative_wait_store['all'].append(self._sum_waiting_time[TL])
+            self._avg_queue_length_store['all'].append(self._sum_queue_length[TL] / self._max_steps)
 
 
     @property
