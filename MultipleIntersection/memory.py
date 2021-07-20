@@ -37,9 +37,9 @@ class Memory:
         return len(self._samples)
 
 class ST_Memory:
-    def __init__(self, size, shape):
+    def __init__(self, shape):
         self._samples = np.empty(shape=shape)
-        self._size = size
+        self._size = shape[0]
         self._size_now = 0
 
 
