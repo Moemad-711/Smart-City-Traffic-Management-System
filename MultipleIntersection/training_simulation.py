@@ -607,12 +607,17 @@ class Simulation:
         """
         Save the stats of the episode to plot the graphs at the end of the session
         """
+        sum_waiting_time_all = 0
+        sum_queue_length_all = 0
         for TL in self._TL_list:
             self._reward_store[TL].append(self._sum_neg_reward[TL])  # how much negative reward in this episode
             self._cumulative_wait_store[TL].append(self._sum_waiting_time[TL])  # total number of seconds waited by cars in this episode
             self._avg_queue_length_store[TL].append(self._sum_queue_length[TL] / self._max_steps)  # average number of queued cars per step, in this episode
-            self._cumulative_wait_store['all'].append(self._sum_waiting_time[TL])
-            self._avg_queue_length_store['all'].append(self._sum_queue_length[TL] / self._max_steps)
+            sum_waiting_time_all += self._sum_waiting_time[TL]
+            sum_queue_length_all += self._sum_queue_length[TL] / self._max_steps
+
+        self._cumulative_wait_store['all'].append(sum_waiting_time_all)
+        self._avg_queue_length_store['all'].append(sum_queue_length_all/4)
 
 
     @property

@@ -31,8 +31,8 @@ class Simulation:
         self._green_duration = green_duration
         self._yellow_duration = yellow_duration
         self._reward_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
-        self._cumulative_wait_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
-        self._avg_queue_length_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[]}
+        self._cumulative_wait_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[], 'all':[]}
+        self._avg_queue_length_store = {'TL1':[], 'TL2':[], 'TL3':[], 'TL4':[], 'all':[]}
         self._current_phase_duration = {'TL1':0, 'TL2':0, 'TL3':0, 'TL4':0}
         self._TL_list = ['TL1','TL2','TL3','TL4']
         self._action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
@@ -176,10 +176,17 @@ class Simulation:
         """
         Save the stats of the episode to plot the graphs at the end of the session
         """
+        sum_waiting_time_all = 0
+        sum_queue_length_all = 0
         for TL in self._TL_list:
-            self._reward_store.append(self._sum_neg_reward[TL])  # how much negative reward in this episode
-            self._cumulative_wait_store.append(self._sum_waiting_time[TL])  # total number of seconds waited by cars in this episode
-            self._avg_queue_length_store.append(self._sum_queue_length[TL] / self._max_steps)  # average number of queued cars per step, in this episode
+            self._reward_store[TL].append(self._sum_neg_reward[TL])  # how much negative reward in this episode
+            self._cumulative_wait_store[TL].append(self._sum_waiting_time[TL])  # total number of seconds waited by cars in this episode
+            self._avg_queue_length_store[TL].append(self._sum_queue_length[TL] / self._max_steps)  # average number of queued cars per step, in this episode
+            sum_waiting_time_all += self._sum_waiting_time[TL]
+            sum_queue_length_all += self._sum_queue_length[TL] / self._max_steps
+
+        self._cumulative_wait_store['all'].append(sum_waiting_time_all)
+        self._avg_queue_length_store['all'].append(sum_queue_length_all/4)
 
 
     @property
