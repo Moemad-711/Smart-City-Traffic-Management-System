@@ -59,6 +59,7 @@ class Simulation:
         old_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
         current_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
         is_phase_green = {'TL1':True, 'TL2':True, 'TL3':True, 'TL4':True}
+        self._current_phase_duration = {'TL1':0, 'TL2':0, 'TL3':0, 'TL4':0}
         reward = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
         old_action = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
 
