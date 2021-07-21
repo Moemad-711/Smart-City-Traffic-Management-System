@@ -58,11 +58,11 @@ class TrainModel:
         self._model.fit(states, q_sa, epochs=1, verbose=0)
 
 
-    def save_model(self, path):
+    def save_model(self, path,TL):
         """
         Save the current model in the folder as h5 file and a model architecture summary as png
         """
-        self._model.save(os.path.join(path, 'trained_model.h5'))
+        self._model.save(os.path.join(path, 'trained_model_%s.h5' %(TL)))
         plot_model(self._model, to_file=os.path.join(path, 'model_structure.png'), show_shapes=True, show_layer_names=True)
 
 
