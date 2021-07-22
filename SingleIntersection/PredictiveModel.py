@@ -154,6 +154,11 @@ class TestPredictiveModel:
         """
         Load the model stored in the folder specified by the model number, if it exists
         """
+        if tf.test.gpu_device_name():
+            print('Default GPU Device: {}'.format(tf.test.gpu_device_name()))
+        else:
+            print("Please install GPU version of TF")
+            
         model_file_path = os.path.join(model_folder_path, 'trained_predictive_model.h5')
         
         if os.path.isfile(model_file_path):
