@@ -98,6 +98,7 @@ class Simulation:
 
             self._simulate() 
         traci.close()
+        self._save_episode_stats()
         simulation_time = round(timeit.default_timer() - start_time, 1)
         return simulation_time
 
