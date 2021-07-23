@@ -144,26 +144,8 @@ class Simulation:
                             self._current_phase_duration[TL] = greenlight_duration
                         else:
                             self._current_phase_duration[TL] = self._green_duration
-                    
-
-
-            # calculate reward of previous action: (change in cumulative waiting time between actions)
-            # waiting time = seconds waited by a car since the spawn in the environment, cumulated for every car in incoming lanes
-            current_total_wait = self._collect_waiting_times()
-            reward = old_total_wait - current_total_wait
-
-            # choose the light phase to activate, based on the current state of the intersection
-            action = self._choose_action(current_state)
-
-            # if the chosen phase is different from the last phase, activate the yellow phase
-            if self._step != 0 and old_action != action:
-                self._set_yellow_phase(old_action)
-                self._simulate(self._yellow_duration)
-
-            # execute the phase selected before
-            self._set_green_phase(action)
-            
-        #print("Total reward:", np.sum(self._reward_episode))
+                      
+        print("Total reward:", np.sum(self._reward_episode))
         traci.close()
         simulation_time = round(timeit.default_timer() - start_time, 1)
 
