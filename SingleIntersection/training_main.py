@@ -88,7 +88,7 @@ if __name__ == "__main__":
     print("----- End time:", datetime.datetime.now())
     print("----- Session info saved at:", path)
 
-    Model.save_model(path)
+    Model.save_model(path, 'TL')
 
     copyfile(src='training_settings.ini', dst=os.path.join(path, 'training_settings.ini'))
 
