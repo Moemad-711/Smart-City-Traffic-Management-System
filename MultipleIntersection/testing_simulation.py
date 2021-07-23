@@ -208,9 +208,8 @@ class Simulation:
                 
         sample = current_node_features.to_numpy()
         #print(sample)
-        self._st_meomry.add_sample(sample)
-        #sample = sample_dict.to_numpy()
-        #self._st_meomry.add_sample(sample)
+        self._st_memory.add_sample(sample)
+
         queue_length_all = 0
         self._step += 1 # update the step counter
         for TL in self._TL_list:
@@ -325,7 +324,7 @@ class Simulation:
 
         ##### Get Future Demand #####
         
-        st_model_input =  self._st_meomry.get_samples()
+        st_model_input =  self._st_memory.get_samples()
         #print('st_samples: ',st_model_input)
         #print('st_samples_size: ',len(st_model_input))
         
