@@ -184,7 +184,7 @@ class Simulation:
 
     def _simulate(self):
         """
-        Execute steps in sumo while gathering statistics
+        Execute a step in sumo while gathering statistics
         """
         #5400 if todo = 5 and step = 5397 --> 5402 --> todo = 3 
         
@@ -251,12 +251,7 @@ class Simulation:
             queue_length = self._get_queue_length(TL)
             self._sum_queue_length[TL] += queue_length
             self._sum_waiting_time[TL] += queue_length # 1 step while wating in queue means 1 second waited, for each car, therefore queue_lenght == waited_seconds
-
-
-
-
-
-        
+            
        
     def _collect_waiting_times(self,TL):
         """

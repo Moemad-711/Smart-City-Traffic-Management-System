@@ -82,16 +82,16 @@ class TrainModel:
 
 
 class TestModel:
-    def __init__(self, input_dim, model_path):
+    def __init__(self, input_dim, model_path, TL):
         self._input_dim = input_dim
-        self._model = self._load_my_model(model_path)
+        self._model = self._load_my_model(model_path, TL)
 
 
-    def _load_my_model(self, model_folder_path):
+    def _load_my_model(self, model_folder_path,TL):
         """
         Load the model stored in the folder specified by the model number, if it exists
         """
-        model_file_path = os.path.join(model_folder_path, 'trained_model.h5')
+        model_file_path = os.path.join(model_folder_path, 'trained_model_%s.h5' %(TL))
         
         if os.path.isfile(model_file_path):
             loaded_model = load_model(model_file_path)

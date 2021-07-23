@@ -57,17 +57,12 @@ if __name__ == "__main__":
                             config['learning_rate'], 
                             input_dim=config['num_states'], 
                             output_dim=config['num_actions'])}
-        
-    
     
     #Create an ST_Model(GNN) Object 
     st_model = TestPredictiveModel(
         adjacency_matrix, 
         os.path.join('st_models', 'model_2'))
    
-        
-    print('model done')
-
     Memories={  'TL1':Memory(config['memory_size_max'], 
                              config['memory_size_min']),
                 'TL2':Memory(config['memory_size_max'], 
