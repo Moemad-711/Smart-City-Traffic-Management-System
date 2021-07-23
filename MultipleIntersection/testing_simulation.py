@@ -17,14 +17,39 @@ PHASE_EWL_GREEN = 6  # action 3 code 11
 PHASE_EWL_YELLOW = 7
 
 # Lanes List
-N_Straight = ['N2TL_0', 'N2TL_1', 'N2TL_2']
-N_left = ['N2TL_3']
-S_Straight = ['S2TL_0', 'S2TL_1', 'S2TL_2']
-S_left = ['S2TL_3']
-W_Straight = ['W2TL_0', 'W2TL_1', 'W2TL_2']
-W_left = ['W2TL_3']
-E_Straight = ['E2TL_0', 'E2TL_1', 'E2TL_2']
-E_left = ['E2TL_3']
+# Lanes List
+N_Straight={'TL1':['ln_tl1_0', 'ln_tl1_1', 'ln_tl1_2'],
+            'TL2':['rn_tl2_0', 'rn_tl2_1', 'rn_tl2_2'],
+            'TL3':['tl1_tl3_0', 'tl1_tl3_1', 'tl1_tl3_2'],
+            'TL4':['tl2_tl4_0', 'tl2_tl4_1', 'tl2_tl4_2']}
+N_left={'TL1':['ln_tl1_3'],
+        'TL2':['rn_tl2_3'],
+        'TL3':['tl1_tl3_3'],
+        'TL4':['tl2_tl4_3']}
+S_Straight={'TL1':['tl3_tl1_0', 'tl3_tl1_1', 'tl3_tl1_2'],
+            'TL2':['tl4_tl2_0', 'tl4_tl2_1', 'tl4_tl2_2'],
+            'TL3':['ls_tl3_0', 'ls_tl3_1', 'ls_tl3_2'],
+            'TL4':['rs_tl4_0', 'rs_tl4_1', 'rs_tl4_2']}
+S_left={'TL1':['tl3_tl1_3'],
+        'TL2':['tl4_tl2_3'],
+        'TL3':['ls_tl3_3'],
+        'TL4':['rs_tl4_3']}
+W_Straight={'TL1':['uw_tl1_0', 'uw_tl1_1', 'uw_tl1_2'],
+            'TL2':['tl1_tl2_0', 'tl1_tl2_1', 'tl1_tl2_2'],
+            'TL3':['lw_tl3_0', 'lw_tl3_1', 'lw_tl3_2'],
+            'TL4':['tl3_tl4_0', 'tl3_tl4_1', 'tl3_tl4_2']} 
+W_left={'TL1':['uw_tl1_3'],
+        'TL2':['tl1_tl2_3'],
+        'TL3':['lw_tl3_3'],
+        'TL4':['tl3_tl4_3']}
+E_Straight={'TL1':['tl2_tl1_0', 'tl2_tl1_1', 'tl2_tl1_2'],
+            'TL2':['ue_tl2_0', 'ue_tl2_1', 'ue_tl2_2'],
+            'TL3':['tl4_tl3_0', 'tl4_tl3_1', 'tl4_tl3_2'],
+            'TL4':['le_tl4_0', 'le_tl4_1', 'le_tl4_2']} 
+E_left={'TL1':['tl2_tl1_3'],
+        'TL2':['ue_tl2_3'],
+        'TL3':['tl4_tl3_3'],
+        'TL4':['le_tl4_3']}
 
 
 class Simulation:
@@ -68,6 +93,7 @@ class Simulation:
         self._current_phase_duration = {'TL1':0, 'TL2':0, 'TL3':0, 'TL4':0}
         reward = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
         current_state = {'TL1':-1,'TL2':-1,'TL3':-1,'TL4':-1}
+        current_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
 
         while self._step < self._max_steps:
             for TL in self._TL_list:
