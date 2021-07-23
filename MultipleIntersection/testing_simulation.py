@@ -96,6 +96,7 @@ class Simulation:
         current_total_wait = {'TL1':0,'TL2':0,'TL3':0,'TL4':0}
 
         while self._step < self._max_steps:
+            print('step: ', self._step)
             for TL in self._TL_list:
                 if self._current_phase_duration[TL] ==0:
                     if is_phase_green[TL]== True:
@@ -144,6 +145,8 @@ class Simulation:
                             self._current_phase_duration[TL] = greenlight_duration
                         else:
                             self._current_phase_duration[TL] = self._green_duration
+            self._simulate()
+
                       
         print("Total reward:", np.sum(self._reward_episode))
         traci.close()
