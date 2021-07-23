@@ -3,6 +3,8 @@ from __future__ import print_function
 
 import os
 from shutil import copyfile
+from PredictiveModel import TestPredictiveModel
+from memory import ST_Memory
 
 from testing_simulation import Simulation
 from generator import TrafficGenerator
@@ -16,11 +18,26 @@ if __name__ == "__main__":
     config = import_test_configuration(config_file='testing_settings.ini')
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
     model_path, plot_path = set_test_path(config['models_path_name'], config['model_to_test'])
+    adjacency_matrix = [[0, 750, 750, 750, 750],
+                        [750, 0, 0, 0, 0],
+                        [750, 0, 0, 0, 0],
+                        [750, 0, 0, 0, 0],
+                        [750, 0, 0, 0, 0],]
 
     Model = TestModel(
         input_dim=config['num_states'],
         model_path=model_path
     )
+    
+    st_model=TestPredictiveModel(
+        adjacency_matrix, 
+        os.path.join('st_models', 'model_25')
+    )
+
+    st_memory=ST_Memory(
+        config['st_memory_size'], 
+        (9,1,8))
+
 
     TrafficGen = TrafficGenerator(
         config['max_steps'], 
@@ -34,6 +51,8 @@ if __name__ == "__main__":
         
     Simulation = Simulation(
         Model,
+        st_model,
+        st_memory,
         TrafficGen,
         sumo_cmd,
         config['max_steps'],
