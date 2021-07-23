@@ -1,6 +1,4 @@
-from MultipleIntersection.training_main import Models, TL
 import math
-
 import pandas as pd
 import traci
 import numpy as np
