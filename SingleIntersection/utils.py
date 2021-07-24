@@ -10,6 +10,21 @@ import os
 import sys
 import xml.etree.ElementTree as et 
 
+def import_st_model_train_configuration(config_file):
+    """
+    Read the config file regarding the training and import its content
+    """
+    content = configparser.ConfigParser()
+    content.read(config_file)
+    config = {}
+    config['batch_size'] = content['model'].getboolean('batch_size')
+    config['prediction_steps'] = content['model'].getint('prediction_steps')
+    config['train_split'] = content['model'].getfloat('train_split')
+    config['training_epochs'] = content['model'].getint('training_epochs')
+    config['traffic_feature_folder_num'] = content['dir'].getint['traffic_feature_folder_num']
+    config['sumocfg_file_name'] = content['dir']['sumocfg_file_name']
+    return config
+ 
 
 def import_static_configuration(config_file):
     """
