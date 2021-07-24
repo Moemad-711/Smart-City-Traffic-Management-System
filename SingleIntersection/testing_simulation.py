@@ -142,7 +142,7 @@ class Simulation:
                                               ignore_index=True)                                                
             
             sample = sample_dict.to_numpy()
-            self._st_meomry.add_sample(sample)
+            self._st_memory.add_sample(sample)
 
             self._step += 1 # update the step counter
             steps_todo -= 1
@@ -258,7 +258,7 @@ class Simulation:
 
         ##### Get Future Demand #####
         
-        st_model_input =  self._st_meomry.get_samples()
+        st_model_input =  self._st_memory.get_samples()
         #print('st_samples: ',st_model_input)
         #print('st_samples_size: ',len(st_model_input))
         

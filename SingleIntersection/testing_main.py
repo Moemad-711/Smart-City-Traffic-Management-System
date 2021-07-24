@@ -14,7 +14,7 @@ from utils import import_test_configuration, set_sumo, set_test_path
 
 
 if __name__ == "__main__":
-
+    
     config = import_test_configuration(config_file='testing_settings.ini')
     sumo_cmd = set_sumo(config['gui'], config['sumocfg_file_name'], config['max_steps'])
     model_path, plot_path = set_test_path(config['models_path_name'], config['model_to_test'])
@@ -33,10 +33,12 @@ if __name__ == "__main__":
         adjacency_matrix, 
         os.path.join('st_models', 'model_25')
     )
-
+    #config['st_memory_size'] = 9
+    st_memory_size = 9
     st_memory=ST_Memory(
-        config['st_memory_size'], 
-        (9,1,8))
+        9, 
+        (9,1,8)
+    )
 
 
     TrafficGen = TrafficGenerator(

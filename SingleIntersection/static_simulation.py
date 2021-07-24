@@ -2,7 +2,7 @@ from numpy.core.numeric import NaN
 from numpy.lib.arraysetops import intersect1d
 from numpy.lib.function_base import average
 import pandas as pd
-from libsumo.libsumo import edge_getIDList, vehicle
+#from libsumo.libsumo import edge_getIDList, vehicle
 import traci
 import numpy as np
 import random

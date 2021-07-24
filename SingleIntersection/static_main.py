@@ -37,9 +37,9 @@ if __name__ == "__main__":
     episode = 0
     timestamp_start = datetime.datetime.now()
     
-    while episode < config['total_episodes']:
+    while episode < 1: #1 config['total_episodes']
         print('\n----- Episode', str(episode+1), 'of', str(config['total_episodes']))
-        simulation_time= Simulation.run(episode)  # run the simulation
+        simulation_time= Simulation.run(10000)  # run the simulation #10000 episode 
         print('Simulation time:', simulation_time)
         episode += 1
 

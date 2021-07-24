@@ -82,8 +82,7 @@ def import_test_configuration(config_file):
     config = {}
     config['gui'] = content['simulation'].getboolean('gui')
     config['max_steps'] = content['simulation'].getint('max_steps')
-    config['n_cars_generated'] = content['simulation'].getint(
-        'n_cars_generated')
+    config['n_cars_generated'] = content['simulation'].getint('n_cars_generated')
     config['episode_seed'] = content['simulation'].getint('episode_seed')
     config['green_duration'] = content['simulation'].getint('green_duration')
     config['yellow_duration'] = content['simulation'].getint('yellow_duration')
